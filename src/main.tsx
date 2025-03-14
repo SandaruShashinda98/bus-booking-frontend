@@ -6,10 +6,12 @@ import HomePage from "./pages/HomePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
 import SingleProfilePage from "./pages/SingleProfilePage";
-import Stats from "./pages/Stats";
-import BusSeatSelection from "./pages/Booking";
-import BookingCancellation from "./pages/Cancel";
+// import Stats from "./pages/Stats";
+// import BusSeatSelection from "./pages/Booking";
+// import BookingCancellation from "./pages/Cancel";
 import AvailableBusSchedules from "./pages/Available";
+import LoginPage from "./pages/auth/Login";
+import SeatBooking from "./pages/seat-booking/SeatBooking";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +24,12 @@ const router = createBrowserRouter([
     element: <AvailableBusSchedules />,
   },
   {
-    path: "/stat",
-    element: <Stats />,
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/seat-booking",
+    element: <SeatBooking />,
   },
   {
     path: "/profile",
