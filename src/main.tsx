@@ -12,11 +12,20 @@ import SingleProfilePage from "./pages/SingleProfilePage";
 import AvailableBusSchedules from "./pages/Available";
 import LoginPage from "./pages/auth/Login";
 import SeatBooking from "./pages/seat-booking/SeatBooking";
+import TripListing from "./pages/trip-listing/TripListing";
+import BookingCancellation from "./pages/Cancel";
+import MealPreOrder from "./pages/seat-booking/MealPreOrder";
+import Dashboard from "./pages/Dashboard";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
     errorElement: <NotFoundPage />,
   },
   {
@@ -30,6 +39,18 @@ const router = createBrowserRouter([
   {
     path: "/seat-booking",
     element: <SeatBooking />,
+  },
+  {
+    path: "/trip-listing",
+    element: <TripListing />,
+  },
+  {
+    path: "/cancel-booking",
+    element: <BookingCancellation />,
+  },
+  {
+    path: "/meal-pre-order",
+    element: <MealPreOrder />,
   },
   {
     path: "/profile",
