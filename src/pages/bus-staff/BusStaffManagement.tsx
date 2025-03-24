@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,38 +12,26 @@ import {
 } from "@/components/ui/select";
 import DataTable from "@/components/shared/DataTable";
 import { TableCell } from "@/components/ui/table";
+import { busStaffListingService } from "@/services/busStaff.service";
 
 const BusStaffManagement = () => {
-  // Sample staff data
-  const [staffMembers, setStaffMembers] = useState([
-    {
-      id: 1,
-      staffId: "123456",
-      staffName: "Mr ABC XYZ",
-      role: "Conductor",
-      contactInformation: "00000000",
-      assignedTrip: "A01",
-      busNumber: "123",
-    },
-    {
-      id: 2,
-      staffId: "234567",
-      staffName: "Ms Jane Doe",
-      role: "Driver",
-      contactInformation: "11111111",
-      assignedTrip: "B02",
-      busNumber: "456",
-    },
-    {
-      id: 3,
-      staffId: "345678",
-      staffName: "Mr John Smith",
-      role: "Conductor",
-      contactInformation: "22222222",
-      assignedTrip: "C03",
-      busNumber: "789",
-    },
-  ]);
+  const [staffMembers, setStaffMembers] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const busStaffData = await busStaffListingService.getAllStaff();
+      if (busStaffData) {
+        console.log(busStaffData);
+        setStaffMembers(busStaffData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch staff data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Setup React Hook Form - moved outside of render functions
   const { register, handleSubmit, reset, setValue } = useForm();
@@ -53,12 +41,12 @@ const BusStaffManagement = () => {
     (data) => {
       reset(
         data || {
-          staffId: "",
-          staffName: "",
+          staff_id: "",
+          staff_name: "",
           role: "Conductor",
-          contactInformation: "",
-          assignedTrip: "",
-          busNumber: "",
+          contact_number: "",
+          assigned_trip: "",
+          assigned_bus_number: "",
         }
       );
     },
@@ -66,37 +54,37 @@ const BusStaffManagement = () => {
   );
 
   // Handle data update (both new and edit)
-  const handleUpdateData = (formData, id = null) => {
-    if (id) {
-      // Editing existing staff member
-      setStaffMembers(
-        staffMembers.map((staff) =>
-          staff.id === id ? { ...staff, ...formData } : staff
-        )
-      );
+  const handleUpdateData = async (formData, _id = null) => {
+    if (_id) {
+      // Editing existing bus
+      const staffData = await busStaffListingService.editStaff(_id, formData);
+
+      console.log(staffData);
+
+      fetchData();
     } else {
       // Adding new staff member
-      const newStaff = {
-        id: Math.max(0, ...staffMembers.map((s) => s.id)) + 1,
-        ...formData,
-      };
-      setStaffMembers([...staffMembers, newStaff]);
+      const busData = await busStaffListingService.createBusStaff(formData);
+
+      console.log(busData);
+
+      fetchData();
     }
   };
 
   // Handle delete
-  const handleDelete = (id) => {
-    setStaffMembers(staffMembers.filter((staff) => staff.id !== id));
+  const handleDelete = (_id) => {
+    setStaffMembers(staffMembers.filter((staff) => staff._id !== _id));
   };
 
   // Define columns for the reusable table
   const columns = [
     {
-      key: "staffId",
+      key: "staff_id",
       label: "Staff ID",
     },
     {
-      key: "staffName",
+      key: "staff_name",
       label: "Staff Name",
     },
     {
@@ -104,15 +92,15 @@ const BusStaffManagement = () => {
       label: "Role",
     },
     {
-      key: "contactInformation",
+      key: "contact_number",
       label: "Contact Information",
     },
     {
-      key: "assignedTrip",
+      key: "assigned_trip",
       label: "Assigned Trip",
     },
     {
-      key: "busNumber",
+      key: "assigned_bus_number",
       label: "Bus Number",
     },
   ];
@@ -123,14 +111,14 @@ const BusStaffManagement = () => {
       <>
         <TableCell>
           <Input
-            {...register("staffId")}
+            {...register("staff_id")}
             placeholder="Staff ID"
             className="w-full"
           />
         </TableCell>
         <TableCell>
           <Input
-            {...register("staffName")}
+            {...register("staff_name")}
             placeholder="Staff Name"
             className="w-full"
           />
@@ -153,21 +141,21 @@ const BusStaffManagement = () => {
         </TableCell>
         <TableCell>
           <Input
-            {...register("contactInformation")}
+            {...register("contact_number")}
             placeholder="Contact Number"
             className="w-full"
           />
         </TableCell>
         <TableCell>
           <Input
-            {...register("assignedTrip")}
-            placeholder="Trip Code"
+            {...register("assigned_trip")}
+            placeholder="Trip Code (assigned trip)"
             className="w-full"
           />
         </TableCell>
         <TableCell>
           <Input
-            {...register("busNumber")}
+            {...register("assigned_bus_number")}
             placeholder="Bus Number"
             className="w-full"
           />

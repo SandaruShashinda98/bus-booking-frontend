@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Calendar as CalendarIcon, PlusCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,40 +20,29 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { TableCell } from "@/components/ui/table";
 import DataTable from "@/components/shared/DataTable";
+import { tripListingService } from "@/services/tripListing.service";
 
 const TripListing = () => {
-  // Sample initial data
-  const [trips, setTrips] = useState([
-    {
-      id: 1,
-      destination: "Paris",
-      startDate: new Date(2025, 3, 15),
-      endDate: new Date(2025, 3, 22),
-      status: "Planned",
-      budget: 2500,
-    },
-    {
-      id: 2,
-      destination: "Tokyo",
-      startDate: new Date(2025, 5, 10),
-      endDate: new Date(2025, 5, 20),
-      status: "Confirmed",
-      budget: 3800,
-    },
-    {
-      id: 3,
-      destination: "New York",
-      startDate: new Date(2025, 7, 5),
-      endDate: new Date(2025, 7, 12),
-      status: "Completed",
-      budget: 3000,
-    },
-  ]);
+  const [trips, setTrips] = useState([]);
 
-  // State for date pickers
+  const fetchData = async () => {
+    try {
+      const tripData = await tripListingService.getAllTrips();
+      if (tripData) {
+        console.log(tripData);
+        setTrips(tripData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch staff data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const [dateField, setDateField] = useState(null);
 
-  // Setup React Hook Form - moved outside of render functions
   const { register, handleSubmit, reset, setValue, watch } = useForm();
 
   // Reset form with data - for editing
@@ -62,8 +51,8 @@ const TripListing = () => {
       reset(
         data || {
           destination: "",
-          startDate: new Date(),
-          endDate: new Date(),
+          start_date: new Date(),
+          end_date: new Date(),
           status: "Planned",
           budget: 0,
         }
@@ -73,19 +62,21 @@ const TripListing = () => {
   );
 
   // Handle data update (both new and edit)
-  const handleUpdateData = (formData, id = null) => {
+  const handleUpdateData = async (formData, id = null) => {
     if (id) {
       // Editing existing trip
-      setTrips(
-        trips.map((trip) => (trip.id === id ? { ...trip, ...formData } : trip))
-      );
+      const tripData = await tripListingService.editTrip(_id, formData);
+
+      console.log(tripData);
+
+      fetchData();
     } else {
       // Adding new trip
-      const newTrip = {
-        id: Math.max(0, ...trips.map((t) => t.id)) + 1,
-        ...formData,
-      };
-      setTrips([...trips, newTrip]);
+      const tripData = await tripListingService.createTrip(formData);
+
+      console.log(tripData);
+
+      fetchData();
     }
   };
 
@@ -109,12 +100,12 @@ const TripListing = () => {
       label: "Destination",
     },
     {
-      key: "startDate",
+      key: "start_date",
       label: "Start Date",
       render: (value) => format(new Date(value), "PP"),
     },
     {
-      key: "endDate",
+      key: "end_date",
       label: "End Date",
       render: (value) => format(new Date(value), "PP"),
     },
@@ -137,12 +128,12 @@ const TripListing = () => {
     {
       key: "budget",
       label: "Budget ($)",
-      render: (value) => `$${value.toLocaleString()}`,
+      render: (value) => `$${value ?? ""}`,
     },
   ];
 
   // Render the form row (for editing or adding)
-  const renderFormRow = (trip) => {
+  const renderFormRow = () => {
     const formData = watch();
 
     return (
@@ -151,7 +142,6 @@ const TripListing = () => {
           <Input
             {...register("destination")}
             placeholder="Destination"
-            disabled={true}
             className="w-full"
           />
         </TableCell>
@@ -161,18 +151,18 @@ const TripListing = () => {
               <Button
                 variant="outline"
                 className="w-full justify-start text-left font-normal"
-                onClick={() => setDateField("startDate")}
+                onClick={() => setDateField("start_date")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {formData.startDate
-                  ? format(new Date(formData.startDate), "PP")
+                {formData.start_date
+                  ? format(new Date(formData.start_date), "PP")
                   : "Select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={new Date(formData.startDate)}
+                selected={new Date(formData.start_date)}
                 onSelect={handleDateSelect}
               />
             </PopoverContent>
@@ -184,18 +174,18 @@ const TripListing = () => {
               <Button
                 variant="outline"
                 className="w-full justify-start text-left font-normal"
-                onClick={() => setDateField("endDate")}
+                onClick={() => setDateField("end_date")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {formData.endDate
-                  ? format(new Date(formData.endDate), "PP")
+                {formData.end_date
+                  ? format(new Date(formData.end_date), "PP")
                   : "Select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={new Date(formData.endDate)}
+                selected={new Date(formData.end_date)}
                 onSelect={handleDateSelect}
               />
             </PopoverContent>

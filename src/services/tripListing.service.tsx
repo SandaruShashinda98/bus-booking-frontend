@@ -7,7 +7,17 @@ export const tripListingService = {
       return response.data.data;
     } catch (error) {
       console.log(error);
-      throw new Error("Failed to get current user");
+      throw new Error("Failed to get current trip");
+    }
+  },
+
+  async createTrip(data: object) {
+    try {
+      const response = await api.post("/trip", data);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current trip");
     }
   },
 
@@ -17,7 +27,7 @@ export const tripListingService = {
       return response.data.data;
     } catch (error) {
       console.log(error);
-      throw new Error("Failed to get current user");
+      throw new Error("Failed to get current trip");
     }
   },
 };
