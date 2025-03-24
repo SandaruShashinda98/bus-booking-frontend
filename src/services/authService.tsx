@@ -1,4 +1,3 @@
-// src/auth/services/authService.js
 import api from "@/api/client";
 import { removeToken, setToken } from "@/utils/tokenStorage";
 
@@ -36,10 +35,19 @@ export const authService = {
   async getCurrentUser() {
     try {
       const response = await api.get("/auth/profile");
-      console.log(response);
       return response.data.data;
     } catch (error) {
       // removeToken();
+      console.log(error);
+      throw new Error("Failed to get current user");
+    }
+  },
+
+  async editCurrentUser(user_id: number, userData: object) {
+    try {
+      const response = await api.patch(`/users/${user_id}`, userData);
+      return response.data.data;
+    } catch (error) {
       console.log(error);
       throw new Error("Failed to get current user");
     }
