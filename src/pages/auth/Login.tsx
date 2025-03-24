@@ -17,13 +17,26 @@ import { LockKeyhole, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 // import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/services/authService";
+import useAuthGuard from "@/contexts/AuthGuardContext";
+
+export interface IUser {
+  permissions: string[];
+  access_token_expires_in: number;
+  created_by: stirng;
+  created_on: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  //TODO add necessary type information
+}
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  // const { login } = useAuth(); // Use the login function from auth context hook
-  
+  const { setUser, setPermissions } = useAuthGuard();
+
   const {
     register,
     handleSubmit,
@@ -44,18 +57,17 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-       const user = await authService.login(data.email, data.password);
-       console.log(user)
 
-      
+      const user: IUser = await authService.login(data.email, data.password);
+      setUser(user);
+      setPermissions(user?.permissions ?? []);
       // Redirect to dashboard after successful login
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
-      console.error('Login error:', err);
+      console.error("Login error:", err);
       setError(
-        err.response?.data?.message || 
-        'Failed to login. Please check your credentials and try again.'
+        err.response?.data?.message ||
+          "Failed to login. Please check your credentials and try again."
       );
     } finally {
       setIsLoading(false);
@@ -81,7 +93,7 @@ const LoginPage = () => {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -160,11 +172,7 @@ const LoginPage = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4">
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
 

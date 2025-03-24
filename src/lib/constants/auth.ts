@@ -75,13 +75,13 @@ export const ROLE_PERMISSIONS = {
   ],
   [ROLES.EDITOR]: [
     // Editors inherit all user permissions
-    ...ROLE_PERMISSIONS[ROLES.USER],
+    // ...ROLE_PERMISSIONS[ROLES.USER],
     PERMISSIONS.CREATE_CONTENT,
     PERMISSIONS.EDIT_CONTENT,
   ],
   [ROLES.ADMIN]: [
     // Admins inherit all editor permissions
-    ...ROLE_PERMISSIONS[ROLES.EDITOR],
+    // ...ROLE_PERMISSIONS[ROLES.EDITOR],
     PERMISSIONS.DELETE_CONTENT,
     PERMISSIONS.VIEW_USERS,
     PERMISSIONS.EDIT_USERS,

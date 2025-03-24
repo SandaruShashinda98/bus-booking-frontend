@@ -3,7 +3,7 @@ import { setupInterceptors } from "@/intercepters/interceptors";
 import axios from "axios";
 
 // Create a base axios instance with common configuration
-const API_BASE_URL = "http://localhost:3100/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
