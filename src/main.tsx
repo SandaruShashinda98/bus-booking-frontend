@@ -7,10 +7,12 @@ import { AuthGuardProvider } from "./contexts/AuthGuardContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthGuardProvider>
-      <BrowserRouter>
-        <Router />
-      </BrowserRouter>
-    </AuthGuardProvider>
+  <div className="bg-slate-500 min-h-screen">
+      <AuthGuardProvider>
+        <BrowserRouter>
+          <Router />
+        </BrowserRouter>
+      </AuthGuardProvider>
+    </div>
   </StrictMode>
 );

@@ -12,10 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { LockKeyhole, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-// import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/services/authService";
 import useAuthGuard from "@/contexts/AuthGuardContext";
 
@@ -41,17 +39,12 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
-    setValue,
   } = useForm({
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
   });
-
-  const rememberMe = watch("rememberMe");
 
   const onSubmit = async (data) => {
     try {
@@ -75,7 +68,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center w-full p-4 justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center w-full p-4 justify-center min-h-screen bg-slate-500">
       <Card className="w-full max-w-md shadow-lg pb-2">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -124,12 +117,12 @@ const LoginPage = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <a
+                {/* <a
                   href="/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-800"
                 >
                   Forgot password?
-                </a>
+                </a> */}
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
@@ -155,36 +148,12 @@ const LoginPage = () => {
                 </p>
               )}
             </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="rememberMe"
-                className="bg-white"
-                checked={rememberMe}
-                disabled={isLoading}
-                onCheckedChange={(checked) => setValue("rememberMe", checked)}
-                {...register("rememberMe")}
-              />
-              <Label htmlFor="rememberMe" className="text-sm font-normal">
-                Remember me for 30 days
-              </Label>
-            </div>
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
-
-            {/* <div className="text-center text-sm">
-              Don't have an account?{" "}
-              <a
-                href="/register"
-                className="font-medium text-blue-600 hover:text-blue-800"
-              >
-                Sign up
-              </a>
-            </div> */}
           </CardFooter>
         </form>
       </Card>
