@@ -17,6 +17,8 @@ import RouteGuard from "./RouteGuard";
 import { PERMISSIONS } from "@/config/permission";
 import SearchTrips from "@/pages/seat-booking/SearchTrips";
 import SeatBookingPage from "@/pages/seat-booking/SeatBooking";
+import DriverDashboard from "@/pages/DriverDashboard";
+import TripPassengerView from "@/pages/AssignedTrips";
 
 export default function Router() {
   return (
@@ -33,14 +35,13 @@ export default function Router() {
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
       <Route path="/meal-pre-order/:tripID/:nic" element={<MealPreOrder />} />
+      <Route
+        path="/user-account"
+        element={<UserAccount />}
+        errorElement={<NotFoundPage />}
+      />
 
-
-
-      <Route path="/restaurant-dashboard" element={<RestaurantDashBoard />} />
-      <Route path="/menu-management" element={<MenuManagement />} />
-      <Route path="/order-management" element={<OrderManagement />} />
-
-      {/* Admin Routes */}
+      {/* Admin Routes - bus owner */}
       <Route
         element={<RouteGuard allowedRoles={[PERMISSIONS.ADMIN]} />}
         errorElement={<NotFoundPage />}
@@ -56,9 +57,9 @@ export default function Router() {
         />
       </Route>
 
-      {/* User Routes */}
+      {/* SUPPORT Routes - restaurant */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.ADMIN]} />}
+        element={<RouteGuard allowedRoles={[PERMISSIONS.SUPPORT]} />}
         errorElement={<NotFoundPage />}
       >
         <Route
@@ -69,6 +70,20 @@ export default function Router() {
         <Route path="/restaurant-dashboard" element={<RestaurantDashBoard />} />
         <Route path="/menu-management" element={<MenuManagement />} />
         <Route path="/order-management" element={<OrderManagement />} />
+      </Route>
+
+      {/* AGENT Routes - restaurant */}
+      <Route
+        element={<RouteGuard allowedRoles={[PERMISSIONS.AGENT]} />}
+        errorElement={<NotFoundPage />}
+      >
+        <Route
+          path="/user-account"
+          element={<UserAccount />}
+          errorElement={<NotFoundPage />}
+        />
+        <Route path="/driver-dashboard" element={<DriverDashboard />} />
+        <Route path="/assigned-trips" element={<TripPassengerView />} />
       </Route>
 
       {/* Error and Fallback Routes */}

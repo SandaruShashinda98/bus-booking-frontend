@@ -55,8 +55,16 @@ const LoginPage = () => {
       console.log(user);
       setUser(user);
       setPermissions(user?.permissions ?? []);
+
+      if (user.permissions.includes("ADMIN")) {
+        navigate("/dashboard");
+      } else if (user.permissions.includes("SUPPORT")) {
+        navigate("/restaurant-dashboard");
+      } else {
+        navigate("/driver-dashboard");
+      }
+      
       // Redirect to dashboard after successful login
-      navigate("/dashboard");
     } catch (err) {
       console.error("Login error:", err);
       setError(

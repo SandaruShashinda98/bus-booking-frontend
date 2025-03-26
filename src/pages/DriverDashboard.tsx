@@ -4,7 +4,7 @@ import { authService } from "@/services/authService";
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
+const DriverDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-slate-500 flex flex-col items-center justify-center relative p-4">
       {/* Log Out Button */}
       <Button
-          onClick={() => navigateTo("/login")}
+        onClick={() => navigateTo("/login")}
         variant="secondary"
         className="absolute top-4 right-4 bg-gray-800 text-white hover:bg-gray-700"
       >
@@ -41,11 +41,8 @@ const Dashboard = () => {
         <Card className="w-full bg-gray-300 border-none">
           <CardHeader className="pb-2 pt-6">
             <CardTitle className="text-4xl font-bold text-center text-gray-800">
-              Bus Buddy
+              Bus Staff
             </CardTitle>
-            <p className="text-2xl text-center text-gray-700 mt-1">
-              Journey In Style
-            </p>
           </CardHeader>
         </Card>
 
@@ -60,27 +57,11 @@ const Dashboard = () => {
           </Button>
 
           <Button
-            onClick={() => navigateTo("/bus-staff-management")}
+            onClick={() => navigateTo("/assigned-trips")}
             variant="outline"
             className="w-full py-6 text-lg bg-gray-300 border-none text-gray-700 hover:bg-gray-400 hover:text-gray-800"
           >
-            Bus Staff Management
-          </Button>
-
-          <Button
-            onClick={() => navigateTo("/fleet-management")}
-            variant="outline"
-            className="w-full py-6 text-lg bg-gray-300 border-none text-gray-700 hover:bg-gray-400 hover:text-gray-800"
-          >
-            Bus Fleet Management
-          </Button>
-
-          <Button
-            onClick={() => navigateTo("/trip-listing")}
-            variant="outline"
-            className="w-full py-6 text-lg bg-gray-300 border-none text-gray-700 hover:bg-gray-400 hover:text-gray-800"
-          >
-            Schedule Trip Management
+            Assigned Trips
           </Button>
         </div>
       </div>
@@ -88,4 +69,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DriverDashboard;

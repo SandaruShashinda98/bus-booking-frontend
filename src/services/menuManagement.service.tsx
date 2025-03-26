@@ -11,6 +11,17 @@ export const menuManagementService = {
     }
   },
 
+  async getAllOrders() {
+    try {
+      const response = await api.get("/menu/orders");
+      console.log(response)
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current menu");
+    }
+  },
+
   async createMenu(data: object) {
     try {
       const response = await api.post("/menu", data);

@@ -141,7 +141,7 @@ const OrderManagement = () => {
       label: "Food Item",
     },
     {
-      key: "order_by_nic",
+      key: "nic",
       label: "Customer NIC",
     },
     {
@@ -154,25 +154,9 @@ const OrderManagement = () => {
       render: (value) => `Rs. ${value ?? 0}`,
     },
     {
-      key: "status",
-      label: "Status",
-      render: (value) => (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium
-          ${value === "Pending" ? "bg-yellow-100 text-yellow-800" : ""}
-          ${value === "Processing" ? "bg-blue-100 text-blue-800" : ""}
-          ${value === "Completed" ? "bg-green-100 text-green-800" : ""}
-          ${value === "Cancelled" ? "bg-red-100 text-red-800" : ""}
-        `}
-        >
-          {value}
-        </span>
-      ),
-    },
-    {
       key: "date",
       label: "Order Date",
-      render: (value) => format(new Date(value), "PP"),
+      // render: (value) => format(new Date(value), "PP"),
     },
   ];
 
@@ -185,6 +169,7 @@ const OrderManagement = () => {
           <Select
             onValueChange={(value) => setValue("food_id", value)}
             defaultValue={formData.food_id}
+            disabled
           >
             <SelectTrigger className="bg-white">
               <SelectValue placeholder="Select Food Item" />
@@ -200,9 +185,10 @@ const OrderManagement = () => {
         </TableCell>
         <TableCell>
           <Input
-            {...register("order_by_nic")}
+            {...register("nic")}
             placeholder="Customer NIC"
             className="w-full bg-white"
+            disabled
           />
         </TableCell>
         <TableCell>
@@ -222,7 +208,7 @@ const OrderManagement = () => {
               0}
           </div>
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <Select
             onValueChange={(value) => setValue("status", value)}
             defaultValue={formData.status || "Pending"}
@@ -237,7 +223,7 @@ const OrderManagement = () => {
               <SelectItem value="Cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
-        </TableCell>
+        </TableCell> */}
         <TableCell>
           <Popover>
             <PopoverTrigger asChild>
@@ -268,7 +254,7 @@ const OrderManagement = () => {
   };
 
   const handleBackToDashboard = () => {
-    navigate("/dashboard");
+    navigate("/restaurant-dashboard");
   };
 
   return (
@@ -344,6 +330,7 @@ const OrderManagement = () => {
                   handleSubmit,
                   resetForm,
                 }}
+                enableActions={false}
               />
             )}
           </div>

@@ -20,15 +20,6 @@ const RestaurantDashBoard = () => {
     fetchData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-      router.push("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   const navigateTo = (path) => {
     navigate(path);
   };
@@ -37,7 +28,7 @@ const RestaurantDashBoard = () => {
     <div className="min-h-screen bg-slate-500 flex flex-col items-center justify-center relative p-4">
       {/* Log Out Button */}
       <Button
-        onClick={handleLogout}
+        onClick={() => navigateTo("/login")}
         variant="secondary"
         className="absolute top-4 right-4 bg-gray-800 text-white hover:bg-gray-700"
       >

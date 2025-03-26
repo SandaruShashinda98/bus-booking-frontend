@@ -18,6 +18,7 @@ const DataTable = ({
   renderFormRow,
   addFormComponent,
   formProviders = {},
+  enableActions = true,
 }) => {
   // Internal state for tracking which row is being edited
   const [editingId, setEditingId] = useState(null);
@@ -161,7 +162,7 @@ const DataTable = ({
 
             {/* Rows for existing data */}
             {data.map((item) =>
-              editingId === item._id ? (
+              editingId === item._id && enableActions ? (
                 // Edit mode
                 <TableRow key={`edit-row-${item._id}`}>
                   {renderFormRow ? (

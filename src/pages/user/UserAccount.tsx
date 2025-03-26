@@ -75,7 +75,7 @@ const UserAccount = () => {
   };
 
   const handleBackToSearch = () => {
-    navigate("/dashboard");
+    navigate(-1);
   };
 
   return (

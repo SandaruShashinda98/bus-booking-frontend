@@ -5,6 +5,7 @@ export const authService = {
   async login(email: string, password: string) {
     try {
       const response = await api.post("/auth/login", { email, password });
+      console.log(response)
       const { access_token, ...res } = response.data.data;
       setToken(access_token);
       return res;
