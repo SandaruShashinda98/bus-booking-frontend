@@ -24,6 +24,7 @@ import { tripListingService } from "@/services/tripListing.service";
 
 const TripListing = () => {
   const [trips, setTrips] = useState([]);
+  const [dateField, setDateField] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -40,8 +41,6 @@ const TripListing = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const [dateField, setDateField] = useState(null);
 
   const { register, handleSubmit, reset, setValue, watch } = useForm();
 

@@ -1,48 +1,88 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { MapPin } from 'lucide-react';
-
-// Import shadcn components
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-// import { toast } from '@/components/ui/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { tripListingService } from "@/services/tripListing.service";
+import { useNavigate, useParams } from "react-router-dom";
 
 const SeatBookingPage = () => {
-  // Mock data for already booked seats
-  const [bookedSeats] = useState([5, 13, 22, 37, 41, 48]);
+  const navigate = useNavigate();
+  const params = useParams();
+  const [bookedSeats, setBookedSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  // React Hook Form setup
   const form = useForm({
     defaultValues: {
-      passengerName: '',
-      pickupLocation: '',
-      dropoffLocation: '',
-      contactNumber: '',
-      email: '',
-      guardianContact: '',
-      specialInstructions: '',
-      idNumber: ''
+      passenger_name: "",
+      pick_up_location: "",
+      drop_location: "",
+      contact_contact: "",
+      email: "",
+      guardian_contact: "",
+      special_instructions: "",
+      nic: "",
     },
   });
 
-  const onSubmit = (data) => {
+  const nic = form.watch("nic");
+
+  const fetchData = async () => {
+    try {
+      const tripData = await tripListingService.getSingleTrip(params?.tripID);
+      if (tripData) {
+        const seatNumbers = tripData.booked_seats?.map(
+          (seat) => seat.seat_number
+        );
+        setBookedSeats(seatNumbers);
+        // form.reset(tripData?.booked_seats[0]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch trip data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onSubmit = async (data) => {
     if (selectedSeats.length === 0) {
-    //   toast({
-    //     title: "Seat selection required",
-    //     description: "Please select at least one seat before proceeding.",
-    //     variant: "destructive"
-    //   });
+      //   toast({
+      //     title: "Seat selection required",
+      //     description: "Please select at least one seat before proceeding.",
+      //     variant: "destructive"
+      //   });
       return;
     }
-    
-    console.log({ ...data, seats: selectedSeats });
-    
+
+    const seats = selectedSeats.map((seat) => {
+      return {
+        ...data,
+        seat_number: seat,
+      };
+    });
+
+    const formData = { booked_seats: seats };
+    const tripData = await tripListingService.editTrip(
+      params?.tripID,
+      formData
+    );
+
+    console.log(tripData);
+    fetchData();
+    navigate(`/meal-pre-order/${params?.tripID}/${nic}`);
     // Show success message
     // toast({
     //   title: "Booking Successful",
@@ -52,10 +92,10 @@ const SeatBookingPage = () => {
 
   const toggleSeatSelection = (seat) => {
     if (bookedSeats.includes(seat)) return; // Prevent selection of already booked seats
-    
-    setSelectedSeats(prev => {
+
+    setSelectedSeats((prev) => {
       if (prev.includes(seat)) {
-        return prev.filter(s => s !== seat);
+        return prev.filter((s) => s !== seat);
       } else {
         return [...prev, seat].sort((a, b) => a - b);
       }
@@ -71,30 +111,34 @@ const SeatBookingPage = () => {
   const renderSeat = (seat) => {
     const isSelected = selectedSeats.includes(seat);
     const isBooked = bookedSeats.includes(seat);
-    
+
     return (
       <div
         key={seat}
         onClick={() => !isBooked && toggleSeatSelection(seat)}
         className={`
           w-16 h-16 flex items-center justify-center 
-          ${isBooked ? 'bg-gray-500 cursor-not-allowed opacity-70' : 'cursor-pointer hover:opacity-90'} 
-          ${isSelected ? 'bg-blue-600' : isBooked ? 'bg-gray-500' : 'bg-black'} 
+          ${
+            isBooked
+              ? "bg-gray-500 cursor-not-allowed opacity-70"
+              : "cursor-pointer hover:opacity-90"
+          } 
+          ${isSelected ? "bg-blue-600" : isBooked ? "bg-gray-500" : "bg-black"} 
           text-white transition-all duration-200
-          ${!isBooked && !isSelected ? 'hover:bg-black hover:opacity-80' : ''}
+          ${!isBooked && !isSelected ? "hover:bg-black hover:opacity-80" : ""}
         `}
       >
-        <span className="text-lg">{String(seat).padStart(2, '0')}</span>
+        <span className="text-lg">{String(seat).padStart(2, "0")}</span>
       </div>
     );
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-gray-100 min-h-screen">
+    <div className="max-w-6xl mx-auto p-4 bg-slate-500 min-h-screen">
       <Card className="shadow-lg">
         <CardContent className="p-6">
           <h1 className="text-4xl font-bold text-blue-900 mb-8">Booking</h1>
-          
+
           <div className="mb-4">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-2">
@@ -110,13 +154,17 @@ const SeatBookingPage = () => {
                 <span>Booked</span>
               </div>
             </div>
-            
+
             {selectedSeats.length > 0 ? (
               <Alert className="bg-blue-50 border-blue-200 mb-4">
                 <AlertDescription>
-                  You've selected {selectedSeats.length} seat(s): 
-                  {selectedSeats.map(seat => (
-                    <Badge key={seat} variant="secondary" className="ml-1 bg-blue-100">
+                  You've selected {selectedSeats.length} seat(s):
+                  {selectedSeats.map((seat) => (
+                    <Badge
+                      key={seat}
+                      variant="secondary"
+                      className="ml-1 bg-blue-100"
+                    >
                       {seat}
                     </Badge>
                   ))}
@@ -137,19 +185,19 @@ const SeatBookingPage = () => {
               <div className="mb-6">
                 <div className="grid grid-flow-row gap-4">
                   <div className="flex justify-between">
-                    {rowOneSeats.map(seat => renderSeat(seat))}
+                    {rowOneSeats.map((seat) => renderSeat(seat))}
                   </div>
-                  
+
                   <div className="flex justify-between">
-                    {rowTwoSeats.map(seat => renderSeat(seat))}
+                    {rowTwoSeats.map((seat) => renderSeat(seat))}
                   </div>
-                  
+
                   <div className="mt-4 flex justify-between">
-                    {rowThreeSeats.map(seat => renderSeat(seat))}
+                    {rowThreeSeats.map((seat) => renderSeat(seat))}
                   </div>
-                  
+
                   <div className="flex justify-between">
-                    {rowFourSeats.map(seat => renderSeat(seat))}
+                    {rowFourSeats.map((seat) => renderSeat(seat))}
                   </div>
                 </div>
               </div>
@@ -159,7 +207,7 @@ const SeatBookingPage = () => {
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="passengerName"
+                    name="passenger_name"
                     rules={{ required: "Passenger name is required" }}
                     render={({ field }) => (
                       <FormItem>
@@ -174,12 +222,12 @@ const SeatBookingPage = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex gap-4">
                     <div className="relative flex-1">
                       <FormField
                         control={form.control}
-                        name="pickupLocation"
+                        name="pick_up_location"
                         rules={{ required: "Pickup location is required" }}
                         render={({ field }) => (
                           <FormItem>
@@ -190,7 +238,10 @@ const SeatBookingPage = () => {
                                   className="rounded-full border border-gray-300 p-4 pr-10"
                                   {...field}
                                 />
-                                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <MapPin
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                  size={20}
+                                />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -198,11 +249,11 @@ const SeatBookingPage = () => {
                         )}
                       />
                     </div>
-                    
+
                     <div className="relative flex-1">
                       <FormField
                         control={form.control}
-                        name="dropoffLocation"
+                        name="drop_location"
                         rules={{ required: "Drop-off location is required" }}
                         render={({ field }) => (
                           <FormItem>
@@ -213,7 +264,10 @@ const SeatBookingPage = () => {
                                   className="rounded-full border border-gray-300 p-4 pr-10"
                                   {...field}
                                 />
-                                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                <MapPin
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                  size={20}
+                                />
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -222,16 +276,16 @@ const SeatBookingPage = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
-                    name="contactNumber"
-                    rules={{ 
+                    name="contact_contact"
+                    rules={{
                       required: "Contact number is required",
                       pattern: {
-                        value: /^[0-9\+\-\s]+$/,
-                        message: "Please enter a valid phone number"
-                      }
+                        value: /^[0-9+\-\s]+$/,
+                        message: "Please enter a valid phone number",
+                      },
                     }}
                     render={({ field }) => (
                       <FormItem>
@@ -246,16 +300,16 @@ const SeatBookingPage = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="email"
-                    rules={{ 
+                    rules={{
                       required: "Email is required",
                       pattern: {
                         value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Please enter a valid email address"
-                      }
+                        message: "Please enter a valid email address",
+                      },
                     }}
                     render={({ field }) => (
                       <FormItem>
@@ -271,10 +325,10 @@ const SeatBookingPage = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
-                    name="guardianContact"
+                    name="guardian_contact"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -289,11 +343,11 @@ const SeatBookingPage = () => {
                     )}
                   />
                 </div>
-                
+
                 <div className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="specialInstructions"
+                    name="special_instructions"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -307,10 +361,10 @@ const SeatBookingPage = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
-                    name="idNumber"
+                    name="nic"
                     rules={{ required: "ID/Passport number is required" }}
                     render={({ field }) => (
                       <FormItem>
@@ -325,7 +379,7 @@ const SeatBookingPage = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex justify-end mt-24">
                     <Button
                       type="submit"

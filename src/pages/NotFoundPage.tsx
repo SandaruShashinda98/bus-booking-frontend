@@ -4,7 +4,7 @@ const NotFoundPage = () => {
   return (
     <>
       <div>404 Not found</div>
-      <Link to={"/home"}>go to home</Link>
+      <Link to={"/search"}>go to main page</Link>
     </>
   );
 };
