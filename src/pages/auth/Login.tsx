@@ -52,6 +52,7 @@ const LoginPage = () => {
       setError(null);
 
       const user: IUser = await authService.login(data.email, data.password);
+      console.log(user);
       setUser(user);
       setPermissions(user?.permissions ?? []);
       // Redirect to dashboard after successful login

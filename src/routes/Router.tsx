@@ -22,14 +22,23 @@ export default function Router() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<SearchTrips />} errorElement={<NotFoundPage />} />
+      <Route
+        path="/"
+        element={<SearchTrips />}
+        errorElement={<NotFoundPage />}
+      />
       <Route path="/search" element={<SearchTrips />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/available" element={<AvailableBusSchedules />} />
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
       <Route path="/meal-pre-order/:tripID/:nic" element={<MealPreOrder />} />
-      <Route path="/user-account" element={<UserAccount />} errorElement={<NotFoundPage />} />
+
+
+
+      <Route path="/restaurant-dashboard" element={<RestaurantDashBoard />} />
+      <Route path="/menu-management" element={<MenuManagement />} />
+      <Route path="/order-management" element={<OrderManagement />} />
 
       {/* Admin Routes */}
       <Route
@@ -40,13 +49,23 @@ export default function Router() {
         <Route path="/bus-staff-management" element={<BusStaffManagement />} />
         <Route path="/trip-listing" element={<TripListing />} />
         <Route path="/fleet-management" element={<BusFleetManagement />} />
+        <Route
+          path="/user-account"
+          element={<UserAccount />}
+          errorElement={<NotFoundPage />}
+        />
       </Route>
 
       {/* User Routes */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.USER]} />}
+        element={<RouteGuard allowedRoles={[PERMISSIONS.ADMIN]} />}
         errorElement={<NotFoundPage />}
       >
+        <Route
+          path="/user-account"
+          element={<UserAccount />}
+          errorElement={<NotFoundPage />}
+        />
         <Route path="/restaurant-dashboard" element={<RestaurantDashBoard />} />
         <Route path="/menu-management" element={<MenuManagement />} />
         <Route path="/order-management" element={<OrderManagement />} />
@@ -58,90 +77,3 @@ export default function Router() {
     </Routes>
   );
 }
-
-// const router = createBrowserRouter([
-//public
-//   {
-//     path: "/",
-//     element: <SearchTrips />,
-//     errorElement: <NotFoundPage />,
-//   },
-//   {
-//     path: "/user-account",
-//     element: <UserAccount />,
-//     errorElement: <NotFoundPage />,
-//   },
-
-//   // PERMISSIONS.ADMIN
-//   {
-//     path: "/dashboard",
-//     element: <Dashboard />,
-//     errorElement: <NotFoundPage />,
-//   },
-//   {
-//     path: "/bus-staff-management",
-//     element: <BusStaffManagement />,
-//     errorElement: <NotFoundPage />,
-//   },
-//   {
-//     path: "/trip-listing",
-//     element: <TripListing />,
-//   },
-//   {
-//     path: "/fleet-management",
-//     element: <BusFleetManagement />,
-//   },
-
-//   // PERMISSIONS.USER
-//   {
-//     path: "/restaurant-dashboard",
-//     element: <RestaurantDashBoard />,
-//     errorElement: <NotFoundPage />,
-//   },
-//   {
-//     path: "/menu-management",
-//     element: <MenuManagement />,
-//     errorElement: <NotFoundPage />,
-//   },
-//   {
-//     path: "/order-management",
-//     element: <OrderManagement />,
-//     errorElement: <NotFoundPage />,
-//   },
-
-//   // public
-//   {
-//     path: "/search",
-//     element: <SearchTrips />,
-//   },
-//   {
-//     path: "/login",
-//     element: <LoginPage />,
-//   },
-//   {
-//     path: "/available",
-//     element: <AvailableBusSchedules />,
-//   },
-//   {
-//     path: "/seat-booking/:tripID",
-//     element: <SeatBooking />,
-//   },
-//   {
-//     path: "/cancel-booking",
-//     element: <BookingCancellation />,
-//   },
-//   {
-//     path: "/meal-pre-order/:tripID/:nic",
-//     element: <MealPreOrder />,
-//   },
-//   // {
-//   //   path: "/profile",
-//   //   element: <ProfilePage />,
-//   //   children: [
-//   //     {
-//   //       path: "/profile/:profileId",
-//   //       element: <SingleProfilePage />,
-//   //     },
-//   //   ],
-//   // },
-// ]);

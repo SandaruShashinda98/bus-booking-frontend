@@ -56,11 +56,13 @@ const TripListing = () => {
     (data) => {
       reset(
         data || {
+          start_location: "",
           destination: "",
           start_date: new Date(),
           end_date: new Date(),
           status: "Planned",
-          budget: 0,
+          price: 0,
+          bus_number: "",
         }
       );
     },
@@ -69,6 +71,7 @@ const TripListing = () => {
 
   // Handle data update (both new and edit)
   const handleUpdateData = async (formData, _id = null) => {
+    console.log(_id)
     try {
       if (_id) {
         // Editing existing trip
@@ -112,18 +115,22 @@ const TripListing = () => {
   // Define columns for the reusable table
   const columns = [
     {
+      key: "start_location",
+      label: "Start Location",
+    },
+    {
       key: "destination",
       label: "Destination",
     },
     {
       key: "start_date",
       label: "Start Date",
-      render: (value) => format(new Date(value), "PP"),
+      // render: (value) => format(new Date(value), "PP"),
     },
     {
       key: "end_date",
       label: "End Date",
-      render: (value) => format(new Date(value), "PP"),
+      // render: (value) => format(new Date(value), "PP"),
     },
     {
       key: "status",
@@ -142,9 +149,13 @@ const TripListing = () => {
       ),
     },
     {
-      key: "budget",
-      label: "Budget ($)",
+      key: "price",
+      label: "Ticket Price ($)",
       render: (value) => `$${value ?? ""}`,
+    },
+    {
+      key: "bus_number",
+      label: "Bus Number",
     },
   ];
 
@@ -154,6 +165,13 @@ const TripListing = () => {
 
     return (
       <>
+        <TableCell>
+          <Input
+            {...register("start_location")}
+            placeholder="Start Location"
+            className="w-full bg-white"
+          />
+        </TableCell>
         <TableCell>
           <Input
             {...register("destination")}
@@ -225,9 +243,17 @@ const TripListing = () => {
         </TableCell>
         <TableCell>
           <Input
-            {...register("budget")}
+            {...register("price")}
             type="number"
-            placeholder="Budget"
+            placeholder="Ticket Price"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("bus_number")}
+            type="text"
+            placeholder="Bus Number"
             className="w-full bg-white"
           />
         </TableCell>

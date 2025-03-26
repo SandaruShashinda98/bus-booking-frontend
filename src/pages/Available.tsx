@@ -172,7 +172,9 @@ const AvailableBusSchedules = () => {
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <h3 className="text-lg font-medium text-gray-800">
-                        {schedule.company ?? "Company Name"}
+                        {`${schedule.creator?.first_name ?? "Company Name"} ${
+                          schedule.creator?.last_name
+                        }`}
                       </h3>
                       <div className="text-sm text-gray-600 mt-1">
                         <div className="flex items-center mb-1">

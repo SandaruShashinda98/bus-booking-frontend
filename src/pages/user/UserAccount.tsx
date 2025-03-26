@@ -65,9 +65,9 @@ const UserAccount = () => {
       console.log(response);
       toast.success("Profile updated successfully!");
       // Navigate back to search after successful update
-      setTimeout(() => {
-        navigate("/search");
-      }, 2000);
+      // setTimeout(() => {
+      //   navigate("/search");
+      // }, 2000);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Failed to update profile. Please try again.");

@@ -34,7 +34,7 @@ const RestaurantDashBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-800 flex flex-col items-center justify-center relative p-4">
+    <div className="min-h-screen bg-slate-500 flex flex-col items-center justify-center relative p-4">
       {/* Log Out Button */}
       <Button
         onClick={handleLogout}
