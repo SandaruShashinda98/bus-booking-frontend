@@ -28,7 +28,7 @@ const SeatBookingPage = () => {
       passenger_name: "",
       pick_up_location: "",
       drop_location: "",
-      contact_contact: "",
+      contact_no: "",
       email: "",
       guardian_contact: "",
       special_instructions: "",
@@ -74,7 +74,11 @@ const SeatBookingPage = () => {
       };
     });
 
-    const formData = { booked_seats: seats };
+    const formData = {
+      ...data,
+      selected_seats: selectedSeats,
+      booked_seats: seats,
+    };
     const tripData = await tripListingService.editTrip(
       params?.tripID,
       formData
@@ -279,7 +283,7 @@ const SeatBookingPage = () => {
 
                   <FormField
                     control={form.control}
-                    name="contact_contact"
+                    name="contact_no"
                     rules={{
                       required: "Contact number is required",
                       pattern: {

@@ -19,6 +19,7 @@ import SearchTrips from "@/pages/seat-booking/SearchTrips";
 import SeatBookingPage from "@/pages/seat-booking/SeatBooking";
 import DriverDashboard from "@/pages/DriverDashboard";
 import TripPassengerView from "@/pages/AssignedTrips";
+import PaymentInterface from "@/pages/seat-booking/Payment";
 
 export default function Router() {
   return (
@@ -35,6 +36,7 @@ export default function Router() {
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
       <Route path="/meal-pre-order/:tripID/:nic" element={<MealPreOrder />} />
+      <Route path="/payment/:tripID/:nic" element={<PaymentInterface />} />
       <Route
         path="/user-account"
         element={<UserAccount />}
@@ -72,7 +74,7 @@ export default function Router() {
         <Route path="/order-management" element={<OrderManagement />} />
       </Route>
 
-      {/* AGENT Routes - restaurant */}
+      {/* AGENT Routes - driver */}
       <Route
         element={<RouteGuard allowedRoles={[PERMISSIONS.AGENT]} />}
         errorElement={<NotFoundPage />}

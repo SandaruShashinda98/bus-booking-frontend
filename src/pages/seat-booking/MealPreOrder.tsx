@@ -47,9 +47,7 @@ const MealPreOrder = () => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-      console.log("Trip ID:", params.tripID);
-      console.log("NIC:", params.nic);
-
+      
       const orderItems = Object.entries(data.items)
         .map(([itemId, count]) => {
           const menuItem = menu.find((item) => item._id === itemId);
@@ -66,7 +64,7 @@ const MealPreOrder = () => {
 
       if (orderItems.length === 0) {
         toast.info("No items selected for pre-order.");
-        navigate(`/search`);
+        navigate(`/payment/${params?.tripID}/${params.nic}`);
         return;
       }
 
@@ -74,7 +72,7 @@ const MealPreOrder = () => {
 
       if (updatedMenus) {
         toast.success("Meal pre-ordered and booking added successfully!");
-        navigate(`/search`);
+        navigate(`/payment/${params?.tripID}/${params.nic}`);
       } else {
         toast.error("Something went wrong with your order. Please try again.");
       }
@@ -90,7 +88,7 @@ const MealPreOrder = () => {
     e.preventDefault();
     console.log("Order skipped");
     toast.info("Meal pre-order skipped and booking added successfully.");
-    navigate(`/search`);
+    navigate(`/payment/${params?.tripID}/${params.nic}`);
   };
 
   // Function to handle quantity change

@@ -150,7 +150,7 @@ const TripListing = () => {
     },
     {
       key: "price",
-      label: "Ticket Price ($)",
+      label: "Ticket Price (Rs)",
       render: (value) => `$${value ?? ""}`,
     },
     {
