@@ -123,12 +123,12 @@ const SeatBookingPage = () => {
           w-16 h-16 flex items-center justify-center 
           ${
             isBooked
-              ? "bg-gray-500 cursor-not-allowed opacity-70"
+              ? "bg-red-600 cursor-not-allowed opacity-70"
               : "cursor-pointer hover:opacity-90"
           } 
-          ${isSelected ? "bg-blue-600" : isBooked ? "bg-gray-500" : "bg-black"} 
+          ${isSelected ? "bg-green-600" : isBooked ? "bg-red-600" : "bg-blue-600"} 
           text-white transition-all duration-200
-          ${!isBooked && !isSelected ? "hover:bg-black hover:opacity-80" : ""}
+          ${!isBooked && !isSelected ? "hover:bg-blue-800 hover:opacity-80" : ""}
         `}
       >
         <span className="text-lg">{String(seat).padStart(2, "0")}</span>
@@ -145,15 +145,15 @@ const SeatBookingPage = () => {
           <div className="mb-4">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-black"></div>
+                <div className="w-4 h-4 bg-blue-600"></div>
                 <span>Available</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-blue-600"></div>
+                <div className="w-4 h-4 bg-green-600"></div>
                 <span>Selected</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-500"></div>
+                <div className="w-4 h-4 bg-red-600"></div>
                 <span>Booked</span>
               </div>
             </div>

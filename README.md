@@ -48,7 +48,7 @@ export default tseslint.config({
   },
 })
 ```
-1. Need to add super user with access to the add bus companies and restaurants.  And super user should be able to view the details. 
+
 2. Email confirmation after payment which includes links to update customer food order and cancel booking.
 3. In the main search UI add one more filter to select time like morning and night.
 4. In bus seat selection page change booked seat color in red and available seat color in blue. And show window sides and front of the bus.
