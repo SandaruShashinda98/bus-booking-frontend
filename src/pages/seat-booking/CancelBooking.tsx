@@ -35,16 +35,7 @@ const BookingCancellation = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {/* Background image container with overlay */}
-      <div className="absolute inset-0 overflow-hidden">
-        <img 
-          src="/api/placeholder/1200/800" 
-          alt="Bus interior" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-blue-900 bg-opacity-80"></div>
-      </div>
+    <div className="flex items-center justify-center min-h-screen bg-slate-500">
 
       {/* Booking cancellation form */}
       <div className="relative w-full max-w-md px-6 z-10">

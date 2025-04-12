@@ -6,9 +6,9 @@ export interface RouteGuardProps {
 }
 
 export default function RouteGuard(props: RouteGuardProps) {
-  const {user,permissions} = useAuthGuard();
-  console.log("permissions",permissions,user);
-  return permissions.find((p) => props.allowedRoles.includes(p)) ? (
+  const { user, role } = useAuthGuard();
+  console.log("role", role, user);
+  return props.allowedRoles.includes(role) ? (
     <Outlet />
   ) : (
     <Navigate to={user ? "/unauthorized" : "/login"} />

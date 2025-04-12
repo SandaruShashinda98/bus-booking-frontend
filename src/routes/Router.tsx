@@ -20,6 +20,7 @@ import SeatBookingPage from "@/pages/seat-booking/SeatBooking";
 import DriverDashboard from "@/pages/DriverDashboard";
 import TripPassengerView from "@/pages/AssignedTrips";
 import PaymentInterface from "@/pages/seat-booking/Payment";
+import UserManagement from "@/pages/user/UseManagement";
 
 export default function Router() {
   return (
@@ -31,17 +32,20 @@ export default function Router() {
         errorElement={<NotFoundPage />}
       />
       <Route path="/search" element={<SearchTrips />} />
+      <Route path="/user-management" element={<UserManagement />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/available" element={<AvailableBusSchedules />} />
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
-      <Route path="/meal-pre-order/:tripID/:nic/:bookingID" element={<MealPreOrder />} />
-      <Route path="/payment/:tripID/:nic/:bookingId" element={<PaymentInterface />} />
       <Route
-        path="/user-account"
-        element={<UserAccount />}
-        errorElement={<NotFoundPage />}
+        path="/meal-pre-order/:tripID/:nic/:bookingID"
+        element={<MealPreOrder />}
       />
+      <Route
+        path="/payment/:tripID/:nic/:bookingId"
+        element={<PaymentInterface />}
+      />
+      <Route path="/user-account" element={<UserAccount />} />
 
       {/* Admin Routes - bus owner */}
       <Route
@@ -59,9 +63,9 @@ export default function Router() {
         />
       </Route>
 
-      {/* SUPPORT Routes - restaurant */}
+      {/* restaurant */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.SUPPORT]} />}
+        element={<RouteGuard allowedRoles={[PERMISSIONS.RESTAURANT]} />}
         errorElement={<NotFoundPage />}
       >
         <Route
@@ -74,9 +78,9 @@ export default function Router() {
         <Route path="/order-management" element={<OrderManagement />} />
       </Route>
 
-      {/* AGENT Routes - driver */}
+      {/*  driver, conductor */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.AGENT]} />}
+        element={<RouteGuard allowedRoles={[PERMISSIONS.AGENT, PERMISSIONS.CONDUCTOR]} />}
         errorElement={<NotFoundPage />}
       >
         <Route

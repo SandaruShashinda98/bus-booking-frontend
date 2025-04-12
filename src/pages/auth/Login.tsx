@@ -16,24 +16,25 @@ import { LockKeyhole, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { authService } from "@/services/authService";
 import useAuthGuard from "@/contexts/AuthGuardContext";
+import { PERMISSIONS } from "@/config/permission";
 
 export interface IUser {
   permissions: string[];
   access_token_expires_in: number;
-  created_by: stirng;
+  created_by: string;
   created_on: string;
   email: string;
   first_name: string;
   last_name: string;
   username: string;
-  //TODO add necessary type information
+  user_role: PERMISSIONS
 }
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { setUser, setPermissions } = useAuthGuard();
+  const { setUser, setRole } = useAuthGuard();
 
   const {
     register,
@@ -50,15 +51,14 @@ const LoginPage = () => {
     try {
       setIsLoading(true);
       setError(null);
-
       const user: IUser = await authService.login(data.email, data.password);
       console.log(user);
       setUser(user);
-      setPermissions(user?.permissions ?? []);
+      setRole(user?.user_role);
 
-      if (user.permissions.includes("ADMIN")) {
+      if (user.user_role === PERMISSIONS.ADMIN) {
         navigate("/dashboard");
-      } else if (user.permissions.includes("SUPPORT")) {
+      } else if (user.user_role === PERMISSIONS.RESTAURANT) {
         navigate("/restaurant-dashboard");
       } else {
         navigate("/driver-dashboard");

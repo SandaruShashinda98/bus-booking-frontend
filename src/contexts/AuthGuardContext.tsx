@@ -8,15 +8,15 @@ export interface AuthGuardProviderProps {
 
 export function AuthGuardProvider(props: AuthGuardProviderProps) {
   const [user, setUser] = useState(null);
-  const [permissions, setPermissions] = useState([]);
+  const [role, setRole] = useState([]);
 
   return (
     <AuthGuardContext.Provider
       value={{
         user,
         setUser,
-        permissions,
-        setPermissions,
+        role,
+        setRole,
       }}
     >
       {props.children}
