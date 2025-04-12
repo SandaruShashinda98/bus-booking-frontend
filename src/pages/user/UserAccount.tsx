@@ -5,11 +5,13 @@ import { Label } from "@/components/ui/label";
 import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import useAuthGuard from "@/contexts/AuthGuardContext";
 
 const UserAccount = () => {
   const [userId, setUserId] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { role } = useAuthGuard();
 
   const {
     register,
@@ -185,16 +187,18 @@ const UserAccount = () => {
                 </div>
 
                 {/* nic */}
-                <div className="space-y-1">
-                  <Label htmlFor="nic" className="text-gray-700">
-                    National ID/License Number
-                  </Label>
-                  <Input
-                    id="nic"
-                    {...register("nic")}
-                    className="h-10 bg-white"
-                  />
-                </div>
+                {(role !== "DRIVER" || role !== "CONDUCTOR") && (
+                  <div className="space-y-1">
+                    <Label htmlFor="nic" className="text-gray-700">
+                      National ID/License Number
+                    </Label>
+                    <Input
+                      id="nic"
+                      {...register("nic")}
+                      className="h-10 bg-white"
+                    />
+                  </div>
+                )}
 
                 {/* contact number and email */}
                 <div className="flex flex-col sm:flex-row justify-between gap-4">

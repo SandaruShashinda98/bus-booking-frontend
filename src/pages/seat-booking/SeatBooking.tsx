@@ -126,9 +126,17 @@ const SeatBookingPage = () => {
               ? "bg-red-600 cursor-not-allowed opacity-70"
               : "cursor-pointer hover:opacity-90"
           } 
-          ${isSelected ? "bg-green-600" : isBooked ? "bg-red-600" : "bg-blue-600"} 
+          ${
+            isSelected
+              ? "bg-green-600"
+              : isBooked
+              ? "bg-red-600"
+              : "bg-blue-600"
+          } 
           text-white transition-all duration-200
-          ${!isBooked && !isSelected ? "hover:bg-blue-800 hover:opacity-80" : ""}
+          ${
+            !isBooked && !isSelected ? "hover:bg-blue-800 hover:opacity-80" : ""
+          }
         `}
       >
         <span className="text-lg">{String(seat).padStart(2, "0")}</span>
@@ -185,22 +193,35 @@ const SeatBookingPage = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Seat Selection UI */}
-              <div className="mb-6">
-                <div className="grid grid-flow-row gap-4">
-                  <div className="flex justify-between">
-                    {rowOneSeats.map((seat) => renderSeat(seat))}
-                  </div>
 
-                  <div className="flex justify-between">
-                    {rowTwoSeats.map((seat) => renderSeat(seat))}
-                  </div>
+              <div className="flex">
+                <div className="my-auto mx-4 bg-gray-400">
+                  <p className="m-4">Front</p>
+                </div>
 
-                  <div className="mt-4 flex justify-between">
-                    {rowThreeSeats.map((seat) => renderSeat(seat))}
+                <div className="mb-6">
+                  <div className="flex justify-center bg-gray-400">
+                    <p>Window</p>
                   </div>
+                  <div className="grid grid-flow-row gap-4">
+                    <div className="flex justify-between">
+                      {rowOneSeats.map((seat) => renderSeat(seat))}
+                    </div>
 
-                  <div className="flex justify-between">
-                    {rowFourSeats.map((seat) => renderSeat(seat))}
+                    <div className="flex justify-between">
+                      {rowTwoSeats.map((seat) => renderSeat(seat))}
+                    </div>
+
+                    <div className="mt-4 flex justify-between">
+                      {rowThreeSeats.map((seat) => renderSeat(seat))}
+                    </div>
+
+                    <div className="flex justify-between">
+                      {rowFourSeats.map((seat) => renderSeat(seat))}
+                    </div>
+                  </div>
+                  <div className="flex justify-center bg-gray-400">
+                    <p>Window</p>
                   </div>
                 </div>
               </div>

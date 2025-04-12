@@ -80,7 +80,7 @@ export default function Router() {
 
       {/*  driver, conductor */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.AGENT, PERMISSIONS.CONDUCTOR]} />}
+        element={<RouteGuard allowedRoles={[PERMISSIONS.DRIVER, PERMISSIONS.CONDUCTOR]} />}
         errorElement={<NotFoundPage />}
       >
         <Route
