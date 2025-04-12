@@ -35,8 +35,8 @@ export default function Router() {
       <Route path="/available" element={<AvailableBusSchedules />} />
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
-      <Route path="/meal-pre-order/:tripID/:nic" element={<MealPreOrder />} />
-      <Route path="/payment/:tripID/:nic" element={<PaymentInterface />} />
+      <Route path="/meal-pre-order/:tripID/:nic/:bookingID" element={<MealPreOrder />} />
+      <Route path="/payment/:tripID/:nic/:bookingId" element={<PaymentInterface />} />
       <Route
         path="/user-account"
         element={<UserAccount />}

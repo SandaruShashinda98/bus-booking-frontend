@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { CreditCard, ShoppingCart, Check, AlertCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { bookingService } from "@/services/booking.service";
+import { toast } from "react-toastify";
 
 const PaymentInterface = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,33 +39,24 @@ const PaymentInterface = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-
-    // Log form data for debugging
-    console.log("Form data:", data);
-    console.log("params?.tripID", params?.tripID);
-    console.log("params.nic", params.nic);
-
     await bookingService
       .editBooking(params?.tripID, {
         card_holder_name: data.card_holder_name,
         card_number: data.card_number,
         card_expiry_date: data.card_expiry_date,
         card_cvc: data.card_cvc,
+        booking_id: params.bookingId
       })
       .then((response) => {
         console.log("Payment response:", response);
         setIsSuccess(true);
+        toast.info("Payment add and booking successful.");
       })
       .catch((error) => {
+        toast.info("Payment failed.");
         console.error("Payment error:", error);
         setIsSubmitting(false);
       });
-
-    // Simulate payment processing
-    // setTimeout(() => {
-    //   setIsSubmitting(false);
-    //   setIsSuccess(true);
-    // }, 1500);
   };
 
   if (isSuccess) {
@@ -80,7 +72,7 @@ const PaymentInterface = () => {
         </Alert>
         <div className="mt-8 text-center">
           <Button
-            onClick={navigate('/search')}
+            onClick={navigate("/search")}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Return to Home

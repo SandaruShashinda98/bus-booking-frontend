@@ -64,7 +64,7 @@ const MealPreOrder = () => {
 
       if (orderItems.length === 0) {
         toast.info("No items selected for pre-order.");
-        navigate(`/payment/${params?.tripID}/${params.nic}`);
+        navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
         return;
       }
 
@@ -72,7 +72,7 @@ const MealPreOrder = () => {
 
       if (updatedMenus) {
         toast.success("Meal pre-ordered and booking added successfully!");
-        navigate(`/payment/${params?.tripID}/${params.nic}`);
+        navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
       } else {
         toast.error("Something went wrong with your order. Please try again.");
       }
@@ -87,8 +87,8 @@ const MealPreOrder = () => {
   const skipOrder = (e) => {
     e.preventDefault();
     console.log("Order skipped");
-    toast.info("Meal pre-order skipped and booking added successfully.");
-    navigate(`/payment/${params?.tripID}/${params.nic}`);
+    toast.info("Meal pre-order skipped.");
+    navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
   };
 
   // Function to handle quantity change

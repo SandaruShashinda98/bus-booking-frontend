@@ -84,9 +84,8 @@ const SeatBookingPage = () => {
       formData
     );
 
-    console.log(tripData);
     fetchData();
-    navigate(`/meal-pre-order/${params?.tripID}/${nic}`);
+    navigate(`/meal-pre-order/${params?.tripID}/${nic}/${tripData.booking_id}`);
     // Show success message
     // toast({
     //   title: "Booking Successful",

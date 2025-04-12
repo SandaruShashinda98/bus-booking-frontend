@@ -219,7 +219,7 @@ const AvailableBusSchedules = () => {
                         </div>
                       </div>
                       <p className="text-gray-900 font-semibold mt-2">
-                        Ticket Price: ${schedule.price}
+                        Ticket Price: Rs. {schedule.price}
                       </p>
                     </div>
                     <button
@@ -280,7 +280,7 @@ const AvailableBusSchedules = () => {
               <div className="flex justify-between items-center border-b pb-2">
                 <span className="font-medium text-gray-600">Ticket Price:</span>
                 <span className="text-xl font-bold text-blue-600">
-                  ${selectedSchedule.price}
+                  Rs. {selectedSchedule.price}
                 </span>
               </div>
 
