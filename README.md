@@ -49,7 +49,4 @@ export default tseslint.config({
 })
 ```
 
-5. In available bus schedule change the ticket price to Rs. And should show the bus company name. 
-7. Add filters in the restaurant menu (veg/non veg option, food price, list of available restaurants). 
 9. Need to update more detail in the trip detail window. 
-10. From the passenger food order window passengers should be able to scroll through multiple restaurants.
