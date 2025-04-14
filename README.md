@@ -49,10 +49,7 @@ export default tseslint.config({
 })
 ```
 
-2. Email confirmation after payment which includes links to update customer food order and cancel booking.
-3. In the main search UI add one more filter to select time like morning and night.
 5. In available bus schedule change the ticket price to Rs. And should show the bus company name. 
-6. In food menu disable unavailable food. 
-7. Add filters in the restaurant menu (veg/non veg option, food price, list of available restaurants) 
+7. Add filters in the restaurant menu (veg/non veg option, food price, list of available restaurants). 
 9. Need to update more detail in the trip detail window. 
 10. From the passenger food order window passengers should be able to scroll through multiple restaurants.

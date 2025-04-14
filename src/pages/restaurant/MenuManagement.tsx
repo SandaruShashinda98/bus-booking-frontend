@@ -54,6 +54,7 @@ const MenuManagement = () => {
           ingredients: "",
           price: 40,
           date: new Date().getFullYear(),
+          is_available: true, // Added is_available field with default value
         }
       );
     },
@@ -101,6 +102,12 @@ const MenuManagement = () => {
     }
   };
 
+  // Toggle availability function
+  const toggleAvailability = (item) => {
+    const updatedItem = { ...item, is_available: !item.is_available };
+    handleUpdateData(updatedItem, item._id);
+  };
+
   // Define columns for the reusable table
   const columns = [
     {
@@ -120,6 +127,21 @@ const MenuManagement = () => {
       key: "date",
       label: "Date",
       render: (value) => format(new Date(value), "PP"),
+    },
+    {
+      key: "is_available",
+      label: "Available",
+      render: (value, item) => (
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            checked={value ?? false}
+            onChange={() => toggleAvailability(item)}
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded bg-white"
+          />
+          <span className="ml-2">{value ? "Yes" : "No"}</span>
+        </div>
+      ),
     },
   ];
 
@@ -172,6 +194,17 @@ const MenuManagement = () => {
               />
             </PopoverContent>
           </Popover>
+        </TableCell>
+        <TableCell>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              {...register("is_available")}
+              defaultChecked={true}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="ml-2">Available</span>
+          </div>
         </TableCell>
       </>
     );

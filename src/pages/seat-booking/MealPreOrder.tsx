@@ -25,7 +25,9 @@ const MealPreOrder = () => {
         setMenu(menuData);
 
         // Initialize the form with the count from menu data
+        // Only initialize counts for available items
         const initialValues = menuData.reduce((acc, item) => {
+          // Set count to 0 for all items, available or not
           acc[item._id] = item.count || 0;
           return acc;
         }, {});
@@ -183,67 +185,80 @@ const MealPreOrder = () => {
                     <p>No menu items available</p>
                   </div>
                 ) : (
-                  menu.map((item) => (
-                    <div
-                      key={item._id}
-                      className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-lg font-medium text-gray-800">
-                          {item.food}
-                        </span>
-                        {item.ingredients && (
-                          <span className="text-sm text-gray-500 mt-1">
-                            {item.ingredients}
+                  menu.map((item) => {
+                    const isAvailable = item.is_available !== false; // Treat undefined as available
+                    return (
+                      <div
+                        key={item._id}
+                        className={`flex items-center justify-between p-4 border rounded-lg transition-shadow ${
+                          isAvailable 
+                            ? "bg-gray-50 border-gray-100 hover:shadow-md" 
+                            : "bg-gray-100 border-gray-200 opacity-75"
+                        }`}
+                      >
+                        <div className="flex flex-col relative">
+                          <span className="text-lg font-medium text-gray-800">
+                            {item.food}
                           </span>
-                        )}
-                        <span className="text-blue-600 font-semibold mt-1">
-                          Rs. {item.price || 0}
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <Controller
-                          name={`items.${item._id}`}
-                          control={control}
-                          render={({ field: { onChange, value } }) => (
-                            <div className="flex items-center">
-                              <button
-                                type="button"
-                                className="w-8 h-8 flex items-center justify-center text-xl bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    item._id,
-                                    value - 1,
-                                    onChange
-                                  )
-                                }
-                                disabled={isSubmitting || (value || 0) <= 0}
-                              >
-                                -
-                              </button>
-                              <div className="w-12 h-10 flex items-center justify-center mx-2 border border-gray-300 rounded-md bg-white">
-                                {value || 0}
-                              </div>
-                              <button
-                                type="button"
-                                className="w-8 h-8 flex items-center justify-center text-xl bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50"
-                                onClick={() =>
-                                  handleQuantityChange(
-                                    item._id,
-                                    value + 1,
-                                    onChange
-                                  )
-                                }
-                                disabled={isSubmitting}
-                              >
-                                +
-                              </button>
+                          {item.ingredients && (
+                            <span className="text-sm text-gray-500 mt-1">
+                              {item.ingredients}
+                            </span>
+                          )}
+                          <span className="text-blue-600 font-semibold mt-1">
+                            Rs. {item.price || 0}
+                          </span>
+                          
+                          {!isAvailable && (
+                            <div className="absolute right-0 -top-2 -mr-2 px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded">
+                              Currently Unavailable
                             </div>
                           )}
-                        />
+                        </div>
+                        <div className="flex items-center">
+                          <Controller
+                            name={`items.${item._id}`}
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                              <div className="flex items-center">
+                                <button
+                                  type="button"
+                                  className="w-8 h-8 flex items-center justify-center text-xl bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item._id,
+                                      value - 1,
+                                      onChange
+                                    )
+                                  }
+                                  disabled={isSubmitting || (value || 0) <= 0 || !isAvailable}
+                                >
+                                  -
+                                </button>
+                                <div className="w-12 h-10 flex items-center justify-center mx-2 border border-gray-300 rounded-md bg-white">
+                                  {value || 0}
+                                </div>
+                                <button
+                                  type="button"
+                                  className="w-8 h-8 flex items-center justify-center text-xl bg-gray-200 hover:bg-gray-300 rounded-full disabled:opacity-50"
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      item._id,
+                                      value + 1,
+                                      onChange
+                                    )
+                                  }
+                                  disabled={isSubmitting || !isAvailable}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            )}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
