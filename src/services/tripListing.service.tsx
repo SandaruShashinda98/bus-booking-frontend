@@ -18,8 +18,7 @@ export const tripListingService = {
       if (filters.from) queryParams.append("from", filters.from);
       if (filters.to) queryParams.append("to", filters.to);
       if (filters.date) queryParams.append("date", filters.date);
-
-      console.log(filters)
+      if (filters.timePreference) queryParams.append("timePreference", filters.timePreference);
 
       const response = await api.get(`/trip/public?${queryParams.toString()}`);
       return response.data.data;

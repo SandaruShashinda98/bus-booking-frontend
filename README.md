@@ -54,5 +54,4 @@ export default tseslint.config({
 bugs
 
 1. user account
-4. calender color
 5. assign trips to driver and conductor

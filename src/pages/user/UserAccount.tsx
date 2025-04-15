@@ -162,7 +162,7 @@ const UserAccount = () => {
                 </div>
 
                 {/* date of birth */}
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <Label htmlFor="dob" className="text-gray-700">
                     Date of Birth
                   </Label>
@@ -172,7 +172,7 @@ const UserAccount = () => {
                     {...register("dob")}
                     className="h-10 bg-white"
                   />
-                </div>
+                </div> */}
 
                 {/* employee id */}
                 <div className="space-y-1">
@@ -255,7 +255,7 @@ const UserAccount = () => {
                 </div>
 
                 {/* date of Joining */}
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                   <Label htmlFor="created_on" className="text-gray-700">
                     Date of Joining
                   </Label>
@@ -266,7 +266,7 @@ const UserAccount = () => {
                     disabled={true}
                     className="h-10 bg-gray-100"
                   />
-                </div>
+                </div> */}
               </div>
 
               <div className="flex justify-end gap-4 pt-4">

@@ -18,11 +18,13 @@ const AvailableBusSchedules = () => {
       const from = searchParams.get("from");
       const to = searchParams.get("to");
       const date = searchParams.get("date");
+      const timePreference = searchParams.get("timePreference");
 
       const tripData = await tripListingService.getAllTripsWithFilter({
         from,
         to,
         date,
+        timePreference
       });
 
       if (tripData) {
