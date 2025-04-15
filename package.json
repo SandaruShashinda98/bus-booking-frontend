@@ -1,13 +1,16 @@
 {
-  "name": "orbitus",
+  "name": "bus buddy",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "dev:clean": "bash scripts/kill-port.sh 5173 && vite",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:clean": "bash scripts/kill-port.sh 5173 && vite build",
+    "preview:clean": "bash scripts/kill-port.sh 5173 && vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
