@@ -172,9 +172,9 @@ const UserManagement = () => {
     );
   };
 
-  const handleBackToDashboard = () => {
-    navigate("/dashboard");
-  };
+  // const handleBackToDashboard = () => {
+  //   navigate("/dashboard");
+  // };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 relative">
@@ -191,7 +191,7 @@ const UserManagement = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-start pt-16 px-4 md:px-8">
         {/* Back Button */}
-        <div className="w-full max-w-6xl mb-4 flex justify-start">
+        {/* <div className="w-full max-w-6xl mb-4 flex justify-start">
           <button
             onClick={handleBackToDashboard}
             className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
@@ -210,7 +210,7 @@ const UserManagement = () => {
             </svg>
             Back to Dashboard
           </button>
-        </div>
+        </div> */}
 
         {/* Card Container */}
         <div className="w-full max-w-6xl bg-white rounded-lg shadow-xl mb-8 overflow-hidden">

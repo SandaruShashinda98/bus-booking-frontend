@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
-import { getToken, isTokenValid } from '../utils/tokenStorage';
+import {  isTokenValid } from '../utils/tokenStorage';
 
 export const AuthContext = createContext({
   isAuthenticated: false,
@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
   
   const login = async (email, password) => {
-    console.log(email)
     const user = await authService.login(email, password);
     setUser(user);
     return user;

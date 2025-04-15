@@ -67,12 +67,12 @@ export const userService = {
   },
 
 
-  async createUSer(userData: object) {
+  async createUser(userData: object) {
     try {
-      const response = (await api.post("/users/register", userData)) as {
+      const response = (await api.patch("/users", userData)) as {
         data: object;
       };
-      return response.data;
+      return response.data.data;
     } catch (error: unknown) {
       throw new Error(error?.response?.data?.message || "Registration failed");
     }

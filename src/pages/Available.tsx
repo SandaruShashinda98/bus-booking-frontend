@@ -246,7 +246,9 @@ const AvailableBusSchedules = () => {
 
             <div className="bg-blue-50 p-3 rounded-lg mb-4">
               <h3 className="text-xl font-semibold text-blue-800">
-                {selectedSchedule.company}
+                {`${selectedSchedule.creator?.first_name ?? "Company Name"} ${
+                  selectedSchedule.creator?.last_name
+                }`}
               </h3>
             </div>
 

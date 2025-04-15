@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -15,77 +15,49 @@ import { Label } from "@/components/ui/label";
 import { LockKeyhole, Mail } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { authService } from "@/services/authService";
-import useAuthGuard from "@/contexts/AuthGuardContext";
-import { PERMISSIONS } from "@/config/permission";
 
-export interface IUser {
-  permissions: string[];
-  access_token_expires_in: number;
-  created_by: string;
-  created_on: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  username: string;
-  user_role: PERMISSIONS;
-}
-
-const LoginPage = () => {
+const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { setUser, setRole } = useAuthGuard();
-
-  useEffect(() => {
-    // Check if user just registered successfully
-    const queryParams = new URLSearchParams(location.search);
-    const registered = queryParams.get("registered");
-
-    if (registered === "true") {
-      setSuccessMessage(
-        "Registration successful! You can now log in with your new account."
-      );
-    }
-  }, [location]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = async (data) => {
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccessMessage(null);
-      const user: IUser = await authService.login(data.email, data.password);
-      setUser(user);
-      setRole(user?.user_role);
-
-      if (user.user_role === PERMISSIONS.ADMIN) {
-        navigate("/user-management");
-      } else if (user.user_role === PERMISSIONS.RESTAURANT) {
-        navigate("/restaurant-dashboard");
-      } else if (user.user_role === PERMISSIONS.BUS_OWNER) {
-        navigate("/dashboard");
-      } else {
-        navigate("/driver-dashboard");
+      if (data.password !== data.confirmPassword) {
+        setError("Passwords do not match");
+        return;
       }
 
-      // Redirect to dashboard after successful login
+      setIsLoading(true);
+      setError(null);
+      
+      // Register the user
+      await authService.register({
+        email: data.email,
+        password: data.password,
+      });
+      
+      // Redirect to login page with success message
+      navigate("/login?registered=true");
+      
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Registration error:", err);
       setError(
         err.response?.data?.message ||
-          "Failed to login. Please check your credentials and try again."
+          "Failed to register. This email might already be in use."
       );
     } finally {
       setIsLoading(false);
@@ -97,10 +69,10 @@ const LoginPage = () => {
       <Card className="w-full max-w-md shadow-lg pb-2">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Welcome to Bus Buddy
+            Create Your Account
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in to your account to continue
+            Register for Bus Buddy to get started
           </CardDescription>
         </CardHeader>
 
@@ -109,14 +81,6 @@ const LoginPage = () => {
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {successMessage && (
-              <Alert variant="default" className="bg-green-50 border-green-200">
-                <AlertDescription className="text-green-800">
-                  {successMessage}
-                </AlertDescription>
               </Alert>
             )}
 
@@ -147,16 +111,9 @@ const LoginPage = () => {
               )}
             </div>
 
+
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                {/* <a
-                  href="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Forgot password?
-                </a> */}
-              </div>
+              <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
                   <LockKeyhole size={18} />
@@ -181,27 +138,45 @@ const LoginPage = () => {
                 </p>
               )}
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                  <LockKeyhole size={18} />
+                </div>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  className={`pl-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
+                  disabled={isLoading}
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                    validate: (value) => value === watch("password") || "Passwords do not match"
+                  })}
+                />
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Registering..." : "Register"}
             </Button>
-
-            <div className="flex items-center justify-center w-full">
-              <div className="border-t border-gray-300 w-full"></div>
-              <span className="px-4 text-gray-500 text-sm">OR</span>
-              <div className="border-t border-gray-300 w-full"></div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => navigate("/register")}
-            >
-              Create Account
-            </Button>
+            <p className="text-center text-sm text-gray-500">
+              Already have an account?{" "}
+              <a
+                href="/login"
+                className="text-blue-600 hover:text-blue-800 font-semibold"
+              >
+                Sign in
+              </a>
+            </p>
           </CardFooter>
         </form>
       </Card>
@@ -209,4 +184,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

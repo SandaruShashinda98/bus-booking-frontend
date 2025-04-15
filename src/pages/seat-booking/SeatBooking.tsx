@@ -43,7 +43,7 @@ const SeatBookingPage = () => {
       const tripData = await tripListingService.getSingleTrip(params?.tripID);
       if (tripData) {
         const seatNumbers = tripData.booked_seats?.map(
-          (seat) => seat.seat_number
+          (seat) => seat?.seat_number
         );
         setBookedSeats(seatNumbers);
         // form.reset(tripData?.booked_seats[0]);
@@ -58,7 +58,7 @@ const SeatBookingPage = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    if (selectedSeats.length === 0) {
+    if (selectedSeats?.length === 0) {
       //   toast({
       //     title: "Seat selection required",
       //     description: "Please select at least one seat before proceeding.",
@@ -67,7 +67,7 @@ const SeatBookingPage = () => {
       return;
     }
 
-    const seats = selectedSeats.map((seat) => {
+    const seats = selectedSeats?.map((seat) => {
       return {
         ...data,
         seat_number: seat,
@@ -94,11 +94,11 @@ const SeatBookingPage = () => {
   };
 
   const toggleSeatSelection = (seat) => {
-    if (bookedSeats.includes(seat)) return; // Prevent selection of already booked seats
+    if (bookedSeats?.includes(seat)) return; // Prevent selection of already booked seats
 
     setSelectedSeats((prev) => {
-      if (prev.includes(seat)) {
-        return prev.filter((s) => s !== seat);
+      if (prev?.includes(seat)) {
+        return prev?.filter((s) => s !== seat);
       } else {
         return [...prev, seat].sort((a, b) => a - b);
       }
@@ -113,7 +113,7 @@ const SeatBookingPage = () => {
 
   const renderSeat = (seat) => {
     const isSelected = selectedSeats.includes(seat);
-    const isBooked = bookedSeats.includes(seat);
+    const isBooked = bookedSeats?.includes(seat);
 
     return (
       <div

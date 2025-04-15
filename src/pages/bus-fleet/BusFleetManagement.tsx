@@ -110,10 +110,10 @@ const BusFleetManagement = () => {
       key: "facility_details",
       label: "Facility Details",
     },
-    {
-      key: "assigned_route",
-      label: "Assigned Route",
-    },
+    // {
+    //   key: "assigned_route",
+    //   label: "Assigned Route",
+    // },
     {
       key: "driver_conductor_linked",
       label: "Driver/Conductor Linked",
@@ -161,13 +161,13 @@ const BusFleetManagement = () => {
             className="w-full bg-white"
           />
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <Input
             {...register("assigned_route")}
             placeholder="Route name"
             className="w-full bg-white"
           />
-        </TableCell>
+        </TableCell> */}
         <TableCell>
           <Input
             {...register("driver_conductor_linked")}

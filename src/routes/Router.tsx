@@ -21,6 +21,7 @@ import DriverDashboard from "@/pages/DriverDashboard";
 import TripPassengerView from "@/pages/AssignedTrips";
 import PaymentInterface from "@/pages/seat-booking/Payment";
 import UserManagement from "@/pages/user/UseManagement";
+import RegisterPage from "@/pages/auth/Register";
 
 export default function Router() {
   return (
@@ -32,8 +33,8 @@ export default function Router() {
         errorElement={<NotFoundPage />}
       />
       <Route path="/search" element={<SearchTrips />} />
-      <Route path="/user-management" element={<UserManagement />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/available" element={<AvailableBusSchedules />} />
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
@@ -47,9 +48,17 @@ export default function Router() {
       />
       <Route path="/user-account" element={<UserAccount />} />
 
-      {/* Admin Routes - bus owner */}
+      {/*  admin */}
       <Route
         element={<RouteGuard allowedRoles={[PERMISSIONS.ADMIN]} />}
+        errorElement={<NotFoundPage />}
+      >
+        <Route path="/user-management" element={<UserManagement />} />
+      </Route>
+
+      {/*  bus owner */}
+      <Route
+        element={<RouteGuard allowedRoles={[PERMISSIONS.BUS_OWNER]} />}
         errorElement={<NotFoundPage />}
       >
         <Route path="/dashboard" element={<Dashboard />} />
@@ -80,7 +89,11 @@ export default function Router() {
 
       {/*  driver, conductor */}
       <Route
-        element={<RouteGuard allowedRoles={[PERMISSIONS.DRIVER, PERMISSIONS.CONDUCTOR]} />}
+        element={
+          <RouteGuard
+            allowedRoles={[PERMISSIONS.DRIVER, PERMISSIONS.CONDUCTOR]}
+          />
+        }
         errorElement={<NotFoundPage />}
       >
         <Route

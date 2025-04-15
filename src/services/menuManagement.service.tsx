@@ -11,6 +11,16 @@ export const menuManagementService = {
     }
   },
 
+  async getAllPublicMenus() {
+    try {
+      const response = await api.get("/menu/public");
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current menu");
+    }
+  },
+
   async getAllOrders() {
     try {
       const response = await api.get("/menu/orders");

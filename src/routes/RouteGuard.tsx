@@ -7,7 +7,7 @@ export interface RouteGuardProps {
 
 export default function RouteGuard(props: RouteGuardProps) {
   const { user, role } = useAuthGuard();
-  console.log("role", role, user);
+
   return props.allowedRoles.includes(role) ? (
     <Outlet />
   ) : (

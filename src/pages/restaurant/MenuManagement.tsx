@@ -15,12 +15,14 @@ import {
 import { Calendar as CalendarIcon, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import useAuthGuard from "@/contexts/AuthGuardContext";
 
 const MenuManagement = () => {
   const [menu, setMenu] = useState([]);
   const [dateField, setDateField] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+   const { user } = useAuthGuard();
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -89,7 +91,7 @@ const MenuManagement = () => {
     }
   };
 
-  // Handle delete
+  // Handle delete TODO
   const handleDelete = async (_id) => {
     try {
       // Here you would call your API to delete the menu item
@@ -268,7 +270,7 @@ const MenuManagement = () => {
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
-              Menu Management
+              Menu Management - {`${user?.first_name} ${user?.last_name}`}
             </h1>
           </div>
           <div className="p-6">

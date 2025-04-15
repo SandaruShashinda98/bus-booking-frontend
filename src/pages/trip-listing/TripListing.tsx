@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Calendar as CalendarIcon, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import dayjs from 'dayjs';
 import {
   Popover,
   PopoverContent,
@@ -125,12 +126,12 @@ const TripListing = () => {
     {
       key: "start_date",
       label: "Start Date",
-      // render: (value) => format(new Date(value), "PP"),
+      render: (value) => dayjs(value).format("MMMM D, YYYY"),
     },
     {
       key: "end_date",
       label: "End Date",
-      // render: (value) => format(new Date(value), "PP"),
+      render: (value) => dayjs(value).format("MMMM D, YYYY"),
     },
     {
       key: "status",
@@ -151,7 +152,7 @@ const TripListing = () => {
     {
       key: "price",
       label: "Ticket Price (Rs)",
-      render: (value) => `$${value ?? ""}`,
+      render: (value) => `Rs. ${value ?? ""}`,
     },
     {
       key: "bus_number",

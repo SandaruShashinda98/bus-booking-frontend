@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import dayjs from "dayjs";
 import {
   Popover,
   PopoverContent,
@@ -156,7 +157,7 @@ const OrderManagement = () => {
     {
       key: "date",
       label: "Order Date",
-      // render: (value) => format(new Date(value), "PP"),
+      render: (value) => dayjs(value).format("MMMM D, YYYY"),
     },
   ];
 

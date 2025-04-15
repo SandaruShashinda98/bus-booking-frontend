@@ -30,7 +30,7 @@ const MealPreOrder = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const menuData = await menuManagementService.getAllMenus();
+      const menuData = await menuManagementService.getAllPublicMenus();
       if (menuData) {
         setMenu(menuData);
         setFilteredMenu(menuData);

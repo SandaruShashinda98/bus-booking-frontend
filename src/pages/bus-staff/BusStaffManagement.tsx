@@ -50,7 +50,7 @@ const BusStaffManagement = () => {
         data || {
           staff_id: "",
           staff_name: "",
-          role: "Conductor",
+          role: "",
           contact_number: "",
           assigned_trip: "",
           assigned_bus_number: "",
@@ -151,8 +151,6 @@ const BusStaffManagement = () => {
             <SelectContent>
               <SelectItem value="Conductor">Conductor</SelectItem>
               <SelectItem value="Driver">Driver</SelectItem>
-              <SelectItem value="Supervisor">Supervisor</SelectItem>
-              <SelectItem value="Maintenance">Maintenance</SelectItem>
             </SelectContent>
           </Select>
         </TableCell>
