@@ -1,6 +1,6 @@
-import { tripListingService } from "@/services/tripListing.service";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { tripListingService } from "@/services/tripListing.service";
 
 const AvailableBusSchedules = () => {
   const navigate = useNavigate();
@@ -241,65 +241,106 @@ const AvailableBusSchedules = () => {
       {/* Trip Details Modal */}
       {selectedSchedule && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-xl">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-900">Trip Details</h2>
+              <button 
+                onClick={() => setSelectedSchedule(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
 
-            <div className="bg-blue-50 p-3 rounded-lg mb-4">
-              <h3 className="text-xl font-semibold text-blue-800">
-                {`${selectedSchedule.creator?.first_name ?? "Company Name"} ${
-                  selectedSchedule.creator?.last_name
-                }`}
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b pb-2">
-                <span className="font-medium text-gray-600">
-                  Start Location:
-                </span>
-                <span className="text-gray-900">
-                  {selectedSchedule.start_location}
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b pb-2">
-                <span className="font-medium text-gray-600">End Location:</span>
-                <span className="text-gray-900">
-                  {selectedSchedule.destination}
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b pb-2">
-                <span className="font-medium text-gray-600">Departure:</span>
-                <span className="text-gray-900">
-                  {new Date(selectedSchedule.start_date).toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b pb-2">
-                <span className="font-medium text-gray-600">Arrival:</span>
-                <span className="text-gray-900">
-                  {new Date(selectedSchedule.end_date).toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between items-center border-b pb-2">
-                <span className="font-medium text-gray-600">Ticket Price:</span>
-                <span className="text-xl font-bold text-blue-600">
-                  Rs. {selectedSchedule.price}
-                </span>
+            <div className="grid grid-cols-2 gap-4">
+              {/* Company Info */}
+              <div className="bg-blue-50 p-4 rounded-lg col-span-2 mb-2">
+                <h3 className="text-xl font-semibold text-blue-800">
+                  {`${selectedSchedule.creator?.first_name ?? "Company Name"} ${
+                    selectedSchedule.creator?.last_name
+                  }`}
+                </h3>
               </div>
 
-              <div className="mt-6 flex justify-between">
+              {/* Route Information */}
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">From:</span>
+                <span className="text-gray-900 font-medium">{selectedSchedule.start_location}</span>
+              </div>
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">To:</span>
+                <span className="text-gray-900 font-medium">{selectedSchedule.destination}</span>
+              </div>
+              
+              {/* Schedule */}
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Departure:</span>
+                <span className="text-gray-900">{new Date(selectedSchedule.start_date).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Time:</span>
+                <span className="text-gray-900">{new Date(selectedSchedule.start_date).toLocaleTimeString()}</span>
+              </div>
+              
+              {/* Bus Info */}
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Bus Type:</span>
+                <span className="text-gray-900">{selectedSchedule.bus_type || "Standard"}</span>
+              </div>
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Facilities:</span>
+                <span className="text-gray-900">{selectedSchedule.facilities || "Standard"}</span>
+              </div>
+              
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Washroom Stops:</span>
+                <span className="text-gray-900">{selectedSchedule.washroom_stops || "Not specified"}</span>
+              </div>
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Driver/Conductor:</span>
+                <span className="text-gray-900 text-right">{selectedSchedule.driver_conductor_name || "Not specified"}</span>
+              </div>
+              
+              {/* Price & Status */}
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Price:</span>
+                <span className="text-xl font-bold text-blue-600">Rs. {selectedSchedule.price}</span>
+              </div>
+              <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                <span className="font-medium text-gray-700">Status:</span>
+                <span className={`font-medium px-3 py-1 rounded ${
+                  selectedSchedule.status === "Confirmed" 
+                    ? "bg-green-100 text-green-800" 
+                    : "bg-yellow-100 text-yellow-800"
+                }`}>
+                  {selectedSchedule.status || "Pending"}
+                </span>
+              </div>
+              
+              {/* Actions */}
+              <div className="col-span-2 grid grid-cols-2 gap-4 mt-2">
                 <button
-                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+                  className="bg-gray-200 text-gray-800 px-4 py-3 rounded-md hover:bg-gray-300 transition-colors text-base font-medium"
                   onClick={() => setSelectedSchedule(null)}
                 >
                   Close
                 </button>
                 <button
-                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-                  onClick={() =>
-                    navigate(`/seat-booking/${selectedSchedule._id}`)
-                  }
+                  className="bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors text-base font-medium"
+                  onClick={() => navigate(`/seat-booking/${selectedSchedule._id}`)}
                 >
                   Book Ticket
                 </button>

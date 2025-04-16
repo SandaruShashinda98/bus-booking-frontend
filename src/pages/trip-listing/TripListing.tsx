@@ -64,6 +64,10 @@ const TripListing = () => {
           status: "Planned",
           price: 0,
           bus_number: "",
+          driver_conductor_name: "", // New field
+          washroom_stops: 0, // New field  
+          facilities: "", // New field
+          bus_type: "Normal", // New field
         }
       );
     },
@@ -76,7 +80,7 @@ const TripListing = () => {
     try {
       if (_id) {
         // Editing existing trip
-        const tripData = await tripListingService.editTrip(_id, formData);
+        const tripData = await tripListingService.updateTripOnly(_id, formData);
         console.log(tripData);
         toast.success("Trip updated successfully!");
       } else {
@@ -150,13 +154,29 @@ const TripListing = () => {
       ),
     },
     {
+      key: "bus_number",
+      label: "Bus Number",
+    },
+    {
+      key: "driver_conductor_name", // New column
+      label: "Driver/Conductor Name",
+    },
+    {
+      key: "bus_type", // New column
+      label: "Bus Type",
+    },
+    {
+      key: "facilities", // New column
+      label: "Facilities",
+    },
+    {
+      key: "washroom_stops", // New column
+      label: "Washroom Stops",
+    },
+    {
       key: "price",
       label: "Ticket Price (Rs)",
       render: (value) => `Rs. ${value ?? ""}`,
-    },
-    {
-      key: "bus_number",
-      label: "Bus Number",
     },
   ];
 
@@ -244,17 +264,54 @@ const TripListing = () => {
         </TableCell>
         <TableCell>
           <Input
-            {...register("price")}
-            type="number"
-            placeholder="Ticket Price"
+            {...register("bus_number")}
+            type="text"
+            placeholder="Bus Number"
             className="w-full bg-white"
           />
         </TableCell>
         <TableCell>
           <Input
-            {...register("bus_number")}
-            type="text"
-            placeholder="Bus Number"
+            {...register("driver_conductor_name")}
+            placeholder="Driver and Conductor names"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Select
+            onValueChange={(value) => setValue("bus_type", value)}
+            defaultValue={formData.bus_type || "Normal"}
+          >
+            <SelectTrigger className="bg-white">
+              <SelectValue placeholder="Bus Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Luxury">Luxury</SelectItem>
+              <SelectItem value="Semi-Luxury">Semi-Luxury</SelectItem>
+              <SelectItem value="Normal">Normal</SelectItem>
+            </SelectContent>
+          </Select>
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("facilities")}
+            placeholder="AC, WiFi, TV, etc."
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("washroom_stops")}
+            type="number"
+            placeholder="Number of stops"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("price")}
+            type="number"
+            placeholder="Ticket Price"
             className="w-full bg-white"
           />
         </TableCell>

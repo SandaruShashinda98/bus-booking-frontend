@@ -57,4 +57,14 @@ export const tripListingService = {
       throw new Error("Failed to get current trip");
     }
   },
+
+  async updateTripOnly(trip_id: number, data: object) {
+    try {
+      const response = await api.patch(`/trip/${trip_id}`, data);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current trip");
+    }
+  },
 };

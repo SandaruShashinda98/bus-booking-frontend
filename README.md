@@ -49,9 +49,5 @@ export default tseslint.config({
 })
 ```
 
-9. Need to update more detail in the trip detail window. 
-
-bugs
-
-1. user account
-5. assign trips to driver and conductor
+need to add
+5. email changes with navigation
