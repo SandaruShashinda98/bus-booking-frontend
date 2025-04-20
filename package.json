@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev:clean": "bash scripts/kill-port.sh 5173 && vite",
     "dev": "vite",
+    "dev:clean": "bash scripts/kill-port.sh 5173 && vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
