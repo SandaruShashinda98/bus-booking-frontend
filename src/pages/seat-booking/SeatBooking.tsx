@@ -115,8 +115,8 @@ const SeatBookingPage = () => {
   // Create our seat rows
   const rowOneSeats = [1, 7, 9, 13, 17, 21, 25, 29, 37, 39, 43, 47];
   const rowTwoSeats = [2, 8, 10, 14, 18, 22, 26, 30, 38, 40, 44, 48];
-  const rowThreeSeats = [4, 6, 12, 16, 20, 24, 28, 32, 34, 36, 42, 46, 50];
-  const rowFourSeats = [3, 5, 11, 15, 19, 23, 27, 31, 33, 35, 41, 45, 49];
+  const rowThreeSeats = [4, 6, 12, 16, 20, 24, 28, 32, 34, 36, 42, 46];
+  const rowFourSeats = [3, 5, 11, 15, 19, 23, 27, 31, 33, 35, 41, 45];
 
   const renderSeat = (seat) => {
     const isSelected = selectedSeats.includes(seat);
@@ -211,19 +211,19 @@ const SeatBookingPage = () => {
                     <p>Window</p>
                   </div>
                   <div className="grid grid-flow-row gap-4">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between space-x-4">
                       {rowOneSeats.map((seat) => renderSeat(seat))}
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex justify-between space-x-4">
                       {rowTwoSeats.map((seat) => renderSeat(seat))}
                     </div>
 
-                    <div className="mt-4 flex justify-between">
+                    <div className="mt-4 flex justify-between space-x-4">
                       {rowThreeSeats.map((seat) => renderSeat(seat))}
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex justify-between space-x-4">
                       {rowFourSeats.map((seat) => renderSeat(seat))}
                     </div>
                   </div>
