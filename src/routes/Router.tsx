@@ -22,6 +22,8 @@ import TripPassengerView from "@/pages/AssignedTrips";
 import PaymentInterface from "@/pages/seat-booking/Payment";
 import UserManagement from "@/pages/user/UseManagement";
 import RegisterPage from "@/pages/auth/Register";
+import SeatBookingFromEmail from "@/pages/seat-booking/SeatBookingFromEmail";
+import MealPreOrderFromEmail from "@/pages/seat-booking/MealPreOrderFromEmail";
 
 export default function Router() {
   return (
@@ -36,6 +38,8 @@ export default function Router() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/available" element={<AvailableBusSchedules />} />
+      <Route path="/edit-booking" element={<SeatBookingFromEmail />} />
+      <Route path="/edit-pre-order/:tripID/:nic/:bookingID" element={<MealPreOrderFromEmail />} />
       <Route path="/seat-booking/:tripID" element={<SeatBookingPage />} />
       <Route path="/cancel-booking" element={<BookingCancellation />} />
       <Route

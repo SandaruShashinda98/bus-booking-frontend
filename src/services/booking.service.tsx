@@ -23,4 +23,14 @@ export const bookingService = {
       throw new Error("Failed to get current booking");
     }
   },
+
+  async getBooking(id: string) {
+    try {
+      const response = await api.get(`/booking/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current booking");
+    }
+  },
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -14,15 +14,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CreditCard, ShoppingCart, Check, AlertCircle } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { bookingService } from "@/services/booking.service";
 import { toast } from "react-toastify";
 
 const PaymentInterface = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [bookingDetails, setBookingDetails] = useState(null);
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  console.log("Params:", params);
+
+  // Parse query parameters (for editing from email)
+  const queryParams = new URLSearchParams(location.search);
+  const nicFromQuery =  params.nic;
+  const bookingId =  params.bookingId;
+  const tripId = params.tripID;
 
   const {
     register,
@@ -37,27 +48,92 @@ const PaymentInterface = () => {
     },
   });
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const foundBooking = await bookingService.getBooking(bookingId);
+      console.log("Booking details:", foundBooking);
+      setBookingDetails(foundBooking);
+    } catch (error) {
+      console.error("Failed to fetch booking details:", error);
+      toast.error("Failed to load booking details. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (bookingId) {
+      fetchData();
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+    // Calculate subtotal, tax, and total
+    const getOrderSummary = () => {
+      if (!bookingDetails) {
+        return {
+          subtotal: 0,
+          tax: 0,
+          total: 0
+        };
+      }
+  
+      const ticketPrice = parseFloat(bookingDetails.total_ticket_price || 0);
+      const mealPrice = parseFloat(bookingDetails.total_meal_price || 0);
+      const subtotal = ticketPrice + mealPrice;
+      const tax = 0; // No tax in this example
+      const total = subtotal + tax;
+  
+      return {
+        subtotal,
+        tax,
+        total,
+        ticketPrice,
+        mealPrice
+      };
+    };
+  
+    const { subtotal, tax, total, ticketPrice, mealPrice } = getOrderSummary();
+
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    await bookingService
-      .editBooking(params?.tripID, {
+    try {
+      const response = await bookingService.editBooking(tripId, {
         card_holder_name: data.card_holder_name,
         card_number: data.card_number,
         card_expiry_date: data.card_expiry_date,
         card_cvc: data.card_cvc,
-        booking_id: params.bookingId
-      })
-      .then((response) => {
-        console.log("Payment response:", response);
-        setIsSuccess(true);
-        toast.info("Payment add and booking successful.");
-      })
-      .catch((error) => {
-        toast.info("Payment failed.");
-        console.error("Payment error:", error);
-        setIsSubmitting(false);
+        payment_status: "completed",
+        total_amount: total,
+        booking_id: bookingId,
       });
+      
+      console.log("Payment response:", response);
+      setIsSuccess(true);
+      toast.success("Payment processed and booking confirmed successfully.");
+    } catch (error) {
+      toast.error("Payment failed. Please try again.");
+      console.error("Payment error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const handleReturnHome = () => {
+    navigate("/search");
+  };
+
+
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-4xl mx-auto pt-16 p-4 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
@@ -72,7 +148,7 @@ const PaymentInterface = () => {
         </Alert>
         <div className="mt-8 text-center">
           <Button
-            onClick={navigate("/search")}
+            onClick={handleReturnHome}
             className="bg-blue-600 hover:bg-blue-700"
           >
             Return to Home
@@ -158,12 +234,12 @@ const PaymentInterface = () => {
                           placeholder="MM/YY"
                           {...register("card_expiry_date", {
                             required: "Expiry date is required",
-                            // pattern: {
-                            //   value: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
-                            //   message: "Please use MM/YY format",
-                            // },
+                            pattern: {
+                              value: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+                              message: "Please use MM/YY format",
+                            },
                           })}
-                          // className={errors.card_expiry_date ? "border-red-500" : ""}
+                          className={errors.card_expiry_date ? "border-red-500" : ""}
                         />
                         {errors.card_expiry_date && (
                           <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -177,7 +253,6 @@ const PaymentInterface = () => {
                         <Input
                           id="card_cvc"
                           placeholder="123"
-                          type="password"
                           {...register("card_cvc", {
                             required: "CVC is required",
                             pattern: {
@@ -220,18 +295,30 @@ const PaymentInterface = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {bookingDetails && ticketPrice > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Ticket Price</span>
+                    <span>Rs. {ticketPrice.toFixed(2)}</span>
+                  </div>
+                )}
+                {bookingDetails && mealPrice > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Meal Price</span>
+                    <span>Rs. {mealPrice.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>Rs. 89.99</span>
+                  <span>Rs. {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax</span>
-                  <span>Rs. 00.00</span>
+                  <span>Rs. {tax.toFixed(2)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>$102.18</span>
+                  <span>Rs. {total.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>

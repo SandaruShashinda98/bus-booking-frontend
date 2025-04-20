@@ -61,4 +61,14 @@ export const menuManagementService = {
       throw new Error("Failed to get current menu");
     }
   },
+
+  async editBooking(id:string,data: object) {
+    try {
+      const response = await api.patch(`/booking/${id}`, data);
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current menu");
+    }
+  },
 };

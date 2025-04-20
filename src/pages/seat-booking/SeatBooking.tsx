@@ -21,6 +21,7 @@ const SeatBookingPage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const [bookedSeats, setBookedSeats] = useState([]);
+  const [tripData, setTripData] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
 
   const form = useForm({
@@ -41,6 +42,8 @@ const SeatBookingPage = () => {
   const fetchData = async () => {
     try {
       const tripData = await tripListingService.getSingleTrip(params?.tripID);
+      console.log(tripData)
+      setTripData(tripData);
       if (tripData) {
         const seatNumbers = tripData.booked_seats?.map(
           (seat) => seat?.seat_number
@@ -56,6 +59,8 @@ const SeatBookingPage = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  console.log(selectedSeats)
 
   const onSubmit = async (data) => {
     if (selectedSeats?.length === 0) {
@@ -74,18 +79,20 @@ const SeatBookingPage = () => {
       };
     });
 
+
     const formData = {
       ...data,
       selected_seats: selectedSeats,
       booked_seats: seats,
+      total_ticket_price: tripData.price * selectedSeats.length,
     };
-    const tripData = await tripListingService.editTrip(
+    const _tripData = await tripListingService.editTrip(
       params?.tripID,
       formData
     );
 
     fetchData();
-    navigate(`/meal-pre-order/${params?.tripID}/${nic}/${tripData.booking_id}`);
+    navigate(`/meal-pre-order/${params?.tripID}/${nic}/${_tripData.booking_id}`);
     // Show success message
     // toast({
     //   title: "Booking Successful",

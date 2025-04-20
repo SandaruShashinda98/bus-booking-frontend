@@ -1,25 +1,33 @@
 import { menuManagementService } from "@/services/menuManagement.service";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Sliders, Filter } from "lucide-react"; // Import icons
 
-const MealPreOrder = () => {
+const MealPreOrderFromEmail = () => {
   const [menu, setMenu] = useState([]);
   const [filteredMenu, setFilteredMenu] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  
+  const [isEditMode, setIsEditMode] = useState(false);
+
   // Filter states
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedDietType, setSelectedDietType] = useState("all");
   const [selectedRestaurant, setSelectedRestaurant] = useState("all");
   const [restaurants, setRestaurants] = useState([]);
-  
+
   const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Parse query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const nicFromQuery = queryParams.get("nic") || params.nic;
+  const bookingId = queryParams.get("booking_id") || params.bookingID;
+  const tripId = queryParams.get("trip_id") || params.tripID;
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -31,30 +39,60 @@ const MealPreOrder = () => {
     setIsLoading(true);
     try {
       const menuData = await menuManagementService.getAllPublicMenus();
+      console.log(menuData);
       if (menuData) {
         setMenu(menuData);
         setFilteredMenu(menuData);
 
         // Extract unique restaurants for the filter
-        const uniqueRestaurants = [...new Set(menuData
-          .filter(item => item.restaurant)
-          .map(item => item.restaurant))];
+        const uniqueRestaurants = [
+          ...new Set(
+            menuData
+              .filter((item) => item.restaurant)
+              .map((item) => item.restaurant)
+          ),
+        ];
         setRestaurants(uniqueRestaurants);
 
         // Find min and max price for price range
-        const prices = menuData.map(item => item.price || 0);
+        const prices = menuData.map((item) => item.price || 0);
         if (prices.length > 0) {
           const minPrice = Math.min(...prices);
           const maxPrice = Math.max(...prices);
           setPriceRange([minPrice, maxPrice]);
         }
 
-        // Initialize the form with the count from menu data
+        // Initialize form with zeros
         const initialValues = menuData.reduce((acc, item) => {
-          acc[item._id] = item.count || 0;
+          acc[item._id] = 0;
           return acc;
         }, {});
 
+        // If we have a NIC, it's an edit operation
+        if (nicFromQuery) {
+          setIsEditMode(true);
+          console.log("Edit mode activated for NIC:", nicFromQuery);
+
+          // Find existing orders for this NIC
+          menuData.forEach((item) => {
+            if (item.orders && Array.isArray(item.orders)) {
+              // Sum up all orders by this NIC for this item
+              const userOrders = item.orders.filter(
+                (order) => order.order_by_nic === nicFromQuery
+              );
+              if (userOrders.length > 0) {
+                // Sum up quantities if there are multiple orders
+                const totalQty = userOrders.reduce(
+                  (sum, order) => sum + (order.qty || 0),
+                  0
+                );
+                initialValues[item._id] = totalQty;
+              }
+            }
+          });
+        }
+
+        // Set the form values
         reset({ items: initialValues });
       }
     } catch (error) {
@@ -68,33 +106,37 @@ const MealPreOrder = () => {
   // Apply filters to menu data
   const applyFilters = () => {
     let result = [...menu];
-    
+
     // Filter by restaurant
     if (selectedRestaurant !== "all") {
-      result = result.filter(item => item.restaurant === selectedRestaurant);
+      result = result.filter((item) => item.restaurant === selectedRestaurant);
     }
-    
+
     // Filter by price range
-    result = result.filter(item => {
+    result = result.filter((item) => {
       const itemPrice = item.price || 0;
       return itemPrice >= priceRange[0] && itemPrice <= priceRange[1];
     });
-    
+
     // Filter by diet type (vegetarian/non-vegetarian)
     if (selectedDietType !== "all") {
-      // Assuming we analyze ingredients to determine veg/non-veg status
-      // This is a simplified approach - in a real app, you'd likely have a veg/non-veg field
-      const nonVegKeywords = ["chicken", "meat", "beef", "pork", "fish", "lamb", "mutton", "seafood"];
-      
-      result = result.filter(item => {
+      const nonVegKeywords = [
+        "chicken", "meat", "beef", "pork", "fish", "lamb", "mutton", "seafood"
+      ];
+
+      result = result.filter((item) => {
         const ingredients = (item.ingredients || "").toLowerCase();
-        const containsNonVeg = nonVegKeywords.some(keyword => ingredients.includes(keyword));
-        
-        return (selectedDietType === "veg" && !containsNonVeg) || 
-               (selectedDietType === "nonveg" && containsNonVeg);
+        const containsNonVeg = nonVegKeywords.some((keyword) =>
+          ingredients.includes(keyword)
+        );
+
+        return (
+          (selectedDietType === "veg" && !containsNonVeg) ||
+          (selectedDietType === "nonveg" && containsNonVeg)
+        );
       });
     }
-    
+
     setFilteredMenu(result);
   };
 
@@ -102,15 +144,15 @@ const MealPreOrder = () => {
   const resetFilters = () => {
     setSelectedDietType("all");
     setSelectedRestaurant("all");
-    
+
     // Reset price range to min and max from all items
-    const prices = menu.map(item => item.price || 0);
+    const prices = menu.map((item) => item.price || 0);
     if (prices.length > 0) {
       const minPrice = Math.min(...prices);
       const maxPrice = Math.max(...prices);
       setPriceRange([minPrice, maxPrice]);
     }
-    
+
     setFilteredMenu(menu);
   };
 
@@ -128,39 +170,69 @@ const MealPreOrder = () => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
+
+      // First, identify all menu items that had previous orders from this user
+      // This will help us know which items need to be explicitly set to 0 if they're deselected
+      const userOrderedItemIds = menu
+        .filter(item => 
+          item.orders && 
+          Array.isArray(item.orders) && 
+          item.orders.some(order => order.order_by_nic === nicFromQuery)
+        )
+        .map(item => item._id);
       
-      const orderItems = Object.entries(data.items)
-        .map(([itemId, count]) => {
-          const menuItem = menu.find((item) => item._id === itemId);
-          return {
-            itemId,
-            food: menuItem?.food || "",
-            nic: params.nic,
-            count,
-          };
-        })
-        .filter((item) => item.count > 0); // Only include items with count > 0
+      // Create a complete list of items to update
+      // Include previously ordered items even if they're not selected now
+      const allItemsToUpdate = new Set([
+        ...userOrderedItemIds,
+        ...Object.keys(data.items).filter(itemId => data.items[itemId] > 0)
+      ]);
+      
+      // Create array of order items for API
+      const orderItems = Array.from(allItemsToUpdate).map(itemId => {
+        const menuItem = menu.find(item => item._id === itemId);
+        const count = data.items[itemId] || 0;
+        
+        return {
+          itemId,
+          food: menuItem?.food || "",
+          nic: nicFromQuery,
+          count,
+        };
+      });
 
       console.log("Formatted order:", orderItems);
+      
+      // Count how many items are actually being ordered (count > 0)
+      const itemsBeingOrdered = orderItems.filter(item => item.count > 0);
 
-      if (orderItems.length === 0) {
+      if (itemsBeingOrdered.length === 0) {
         toast.info("No items selected for pre-order.");
-        navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
-        return;
       }
 
+      // Update the menu food orders
       const updatedMenus = await menuManagementService.editMenuFood(orderItems);
-      if (params.bookingID) {
-        await menuManagementService.editBooking(params.bookingID, { 
+      
+      // If in edit mode, update the booking with total meal price
+      if (isEditMode && bookingId) {
+        await menuManagementService.editBooking(bookingId, { 
           total_meal_price: getTotalOrderAmount() 
         });
       }
 
       if (updatedMenus) {
-        toast.success("Meal pre-ordered and booking added successfully!");
-        navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
+        if (isEditMode) {
+          toast.success(itemsBeingOrdered.length > 0 
+            ? "Meal selections updated successfully!" 
+            : "All meal selections have been removed.");
+        } else {
+          toast.success(itemsBeingOrdered.length > 0
+            ? "Meal pre-ordered successfully!"
+            : "Proceeding without meal pre-orders.");
+        }
+        navigate(`/payment/${tripId}/${nicFromQuery}/${bookingId}`);
       } else {
-        toast.error("Something went wrong with your order. Please try again.");
+        toast.error("Something went wrong updating your meal selections. Please try again.");
       }
     } catch (error) {
       console.error("Error submitting meal pre-order:", error);
@@ -174,7 +246,7 @@ const MealPreOrder = () => {
     e.preventDefault();
     console.log("Order skipped");
     toast.info("Meal pre-order skipped.");
-    navigate(`/payment/${params?.tripID}/${params.nic}/${params.bookingID}`);
+    navigate(`/payment/${tripId}/${nicFromQuery}/${bookingId}`);
   };
 
   // Function to handle quantity change
@@ -183,15 +255,12 @@ const MealPreOrder = () => {
     onChange(newValue);
   };
 
-  const handleBackToSearch = () => {
-    navigate("/search");
-  };
-
   // Format price for display
   const formatPrice = (price) => {
     return `Rs. ${price.toFixed(0)}`;
   };
 
+  // Get total order amount
   const getTotalOrderAmount = () => {
     const formValues = control._formValues.items;
     if (!formValues) return 0;
@@ -211,28 +280,6 @@ const MealPreOrder = () => {
     <div className="flex flex-col min-h-screen bg-gradient-to-br bg-slate-500 relative">
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-start pt-16 px-4 md:px-8">
-        {/* Back Button */}
-        <div className="w-full max-w-2xl mb-4 flex justify-start">
-          <button
-            onClick={handleBackToSearch}
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-1"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L4.414 9H17a1 1 0 110 2H4.414l5.293 5.293a1 1 0 010 1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Back to Search
-          </button>
-        </div>
-
         {/* Card Container */}
         <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl p-6 mb-8">
           {/* Header */}
@@ -255,9 +302,9 @@ const MealPreOrder = () => {
                     />
                   </svg>
                 </span>
-                Meal Pre-Order
+                {isEditMode ? "Edit Meal Selections" : "Meal Pre-Order"}
               </h1>
-              
+
               {/* Filter toggle button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -268,7 +315,9 @@ const MealPreOrder = () => {
               </button>
             </div>
             <p className="text-gray-600 mt-2">
-              Select the meals you'd like to pre-order for your trip
+              {isEditMode
+                ? "Update the meals you'd like to pre-order for your trip"
+                : "Select the meals you'd like to pre-order for your trip"}
             </p>
           </div>
 
@@ -287,7 +336,7 @@ const MealPreOrder = () => {
                   Reset Filters
                 </button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Restaurant filter */}
                 <div>
@@ -307,7 +356,7 @@ const MealPreOrder = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 {/* Diet Type filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -324,11 +373,12 @@ const MealPreOrder = () => {
                   </select>
                 </div>
               </div>
-              
+
               {/* Price Range filter */}
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price Range: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+                  Price Range: {formatPrice(priceRange[0])} -{" "}
+                  {formatPrice(priceRange[1])}
                 </label>
                 <div className="flex items-center gap-4">
                   <input
@@ -336,7 +386,9 @@ const MealPreOrder = () => {
                     min={0}
                     max={5000}
                     value={priceRange[0]}
-                    onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                    onChange={(e) =>
+                      setPriceRange([parseInt(e.target.value), priceRange[1]])
+                    }
                     className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
                   <input
@@ -344,12 +396,14 @@ const MealPreOrder = () => {
                     min={0}
                     max={5000}
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                    onChange={(e) =>
+                      setPriceRange([priceRange[0], parseInt(e.target.value)])
+                    }
                     className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
               </div>
-              
+
               <div className="mt-4 text-sm text-gray-600">
                 Showing {filteredMenu.length} of {menu.length} items
               </div>
@@ -393,18 +447,39 @@ const MealPreOrder = () => {
                 ) : (
                   filteredMenu.map((item) => {
                     const isAvailable = item.is_available !== false; // Treat undefined as available
-                    
+
+                    // Check if this item has existing orders by this user
+                    const hasUserOrders =
+                      item.orders &&
+                      Array.isArray(item.orders) &&
+                      item.orders.some(
+                        (order) => order.order_by_nic === nicFromQuery
+                      );
+
                     // Determine if item is vegetarian based on ingredients
-                    const nonVegKeywords = ["chicken", "meat", "beef", "pork", "fish", "lamb", "mutton", "seafood"];
+                    const nonVegKeywords = [
+                      "chicken",
+                      "meat",
+                      "beef",
+                      "pork",
+                      "fish",
+                      "lamb",
+                      "mutton",
+                      "seafood",
+                    ];
                     const ingredients = (item.ingredients || "").toLowerCase();
-                    const isVegetarian = !nonVegKeywords.some(keyword => ingredients.includes(keyword));
-                    
+                    const isVegetarian = !nonVegKeywords.some((keyword) =>
+                      ingredients.includes(keyword)
+                    );
+
                     return (
                       <div
                         key={item._id}
                         className={`flex items-center justify-between p-4 border rounded-lg transition-shadow ${
-                          isAvailable 
-                            ? "bg-gray-50 border-gray-100 hover:shadow-md" 
+                          isAvailable
+                            ? hasUserOrders
+                              ? "bg-blue-50 border-blue-200 hover:shadow-md"
+                              : "bg-gray-50 border-gray-100 hover:shadow-md"
                             : "bg-gray-100 border-gray-200 opacity-75"
                         }`}
                       >
@@ -414,22 +489,31 @@ const MealPreOrder = () => {
                               {item.food}
                             </span>
                             {/* Veg/Non-veg indicator */}
-                            <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
-                              isVegetarian 
-                                ? "bg-green-100 text-green-800" 
-                                : "bg-red-100 text-red-800"
-                            }`}>
+                            <span
+                              className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
+                                isVegetarian
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-red-100 text-red-800"
+                              }`}
+                            >
                               {isVegetarian ? "Veg" : "Non-Veg"}
                             </span>
+
+                            {/* Show if this is an existing order */}
+                            {hasUserOrders && isEditMode && (
+                              <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                Your Order
+                              </span>
+                            )}
                           </div>
-                          
+
                           {/* Restaurant name */}
                           {item.restaurant && (
                             <span className="text-xs text-gray-500 mt-1">
                               {item.restaurant}
                             </span>
                           )}
-                          
+
                           {item.ingredients && (
                             <span className="text-sm text-gray-500 mt-1">
                               {item.ingredients}
@@ -438,7 +522,7 @@ const MealPreOrder = () => {
                           <span className="text-blue-600 font-semibold mt-1">
                             Rs. {item.price || 0}
                           </span>
-                          
+
                           {!isAvailable && (
                             <div className="absolute right-0 -top-2 -mr-2 px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded">
                               Currently Unavailable
@@ -461,7 +545,11 @@ const MealPreOrder = () => {
                                       onChange
                                     )
                                   }
-                                  disabled={isSubmitting || (value || 0) <= 0 || !isAvailable}
+                                  disabled={
+                                    isSubmitting ||
+                                    (value || 0) <= 0 ||
+                                    !isAvailable
+                                  }
                                 >
                                   -
                                 </button>
@@ -492,6 +580,21 @@ const MealPreOrder = () => {
                 )}
               </div>
 
+              {/* Order summary */}
+              {!isLoading && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    Order Summary
+                  </h3>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Total amount:</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      Rs. {getTotalOrderAmount()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Action buttons */}
               <div className="flex justify-between gap-4 mt-8">
                 <button
@@ -500,7 +603,7 @@ const MealPreOrder = () => {
                   className="flex-1 py-3 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50 font-medium transition-colors"
                   disabled={isSubmitting}
                 >
-                  Skip Pre-Order
+                  {isEditMode ? "Skip Changes" : "Skip Pre-Order"}
                 </button>
                 <button
                   type="submit"
@@ -531,11 +634,34 @@ const MealPreOrder = () => {
                       </svg>
                       Processing...
                     </span>
+                  ) : isEditMode ? (
+                    "Update Meal Selections"
                   ) : (
                     "Proceed with Booking"
                   )}
                 </button>
               </div>
+
+              {/* Reset button for edit mode */}
+              {isEditMode && (
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    className="text-red-600 hover:text-red-800 font-medium"
+                    onClick={() => {
+                      // Reset to original form with zeros
+                      const resetValues = filteredMenu.reduce((acc, item) => {
+                        acc[item._id] = 0;
+                        return acc;
+                      }, {});
+                      reset({ items: resetValues });
+                      toast.info("All meal selections cleared");
+                    }}
+                  >
+                    Clear All Selections
+                  </button>
+                </div>
+              )}
             </form>
           )}
         </div>
@@ -544,4 +670,4 @@ const MealPreOrder = () => {
   );
 };
 
-export default MealPreOrder;
+export default MealPreOrderFromEmail;
