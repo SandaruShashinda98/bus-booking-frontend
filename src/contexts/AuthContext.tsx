@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
         try {
           const user = await authService.getCurrentUser();
           setUser(user);
-        } catch (error) {
+        } catch {
           setUser(null);
         }
       }
