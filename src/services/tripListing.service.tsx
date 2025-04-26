@@ -11,6 +11,16 @@ export const tripListingService = {
     }
   },
 
+  async getAssignedTrips() {
+    try {
+      const response = await api.get("/trip/assigned");
+      return response.data.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error("Failed to get current trip");
+    }
+  },
+
   async getAllTripsWithFilter(filters) {
     try {
       const queryParams = new URLSearchParams();

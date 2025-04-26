@@ -13,7 +13,7 @@ const TripPassengerView = () => {
   const fetchTrips = async () => {
     setIsLoading(true);
     try {
-      const tripData = await tripListingService.getAllTrips();
+      const tripData = await tripListingService.getAssignedTrips();
       if (tripData) {
         console.log("Trips:", tripData);
         setTrips(tripData);

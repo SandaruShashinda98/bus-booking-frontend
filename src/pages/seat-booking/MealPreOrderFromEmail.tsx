@@ -121,7 +121,30 @@ const MealPreOrderFromEmail = () => {
     // Filter by diet type (vegetarian/non-vegetarian)
     if (selectedDietType !== "all") {
       const nonVegKeywords = [
-        "chicken", "meat", "beef", "pork", "fish", "lamb", "mutton", "seafood"
+        "chicken",
+        "beef",
+        "pork",
+        "mutton",
+        "fish",
+        "shrimp",
+        "prawn",
+        "seafood",
+        "meat",
+        "lamb",
+        "bacon",
+        "ham",
+        "sausage",
+        "egg",
+        "eggs",
+        "turkey",
+        "duck",
+        "crab",
+        "lobster",
+        "oyster",
+        "squid",
+        "anchovies",
+        "salami",
+        "pepperoni",
       ];
 
       result = result.filter((item) => {
@@ -174,25 +197,26 @@ const MealPreOrderFromEmail = () => {
       // First, identify all menu items that had previous orders from this user
       // This will help us know which items need to be explicitly set to 0 if they're deselected
       const userOrderedItemIds = menu
-        .filter(item => 
-          item.orders && 
-          Array.isArray(item.orders) && 
-          item.orders.some(order => order.order_by_nic === nicFromQuery)
+        .filter(
+          (item) =>
+            item.orders &&
+            Array.isArray(item.orders) &&
+            item.orders.some((order) => order.order_by_nic === nicFromQuery)
         )
-        .map(item => item._id);
-      
+        .map((item) => item._id);
+
       // Create a complete list of items to update
       // Include previously ordered items even if they're not selected now
       const allItemsToUpdate = new Set([
         ...userOrderedItemIds,
-        ...Object.keys(data.items).filter(itemId => data.items[itemId] > 0)
+        ...Object.keys(data.items).filter((itemId) => data.items[itemId] > 0),
       ]);
-      
+
       // Create array of order items for API
-      const orderItems = Array.from(allItemsToUpdate).map(itemId => {
-        const menuItem = menu.find(item => item._id === itemId);
+      const orderItems = Array.from(allItemsToUpdate).map((itemId) => {
+        const menuItem = menu.find((item) => item._id === itemId);
         const count = data.items[itemId] || 0;
-        
+
         return {
           itemId,
           food: menuItem?.food || "",
@@ -202,9 +226,9 @@ const MealPreOrderFromEmail = () => {
       });
 
       console.log("Formatted order:", orderItems);
-      
+
       // Count how many items are actually being ordered (count > 0)
-      const itemsBeingOrdered = orderItems.filter(item => item.count > 0);
+      const itemsBeingOrdered = orderItems.filter((item) => item.count > 0);
 
       if (itemsBeingOrdered.length === 0) {
         toast.info("No items selected for pre-order.");
@@ -212,27 +236,33 @@ const MealPreOrderFromEmail = () => {
 
       // Update the menu food orders
       const updatedMenus = await menuManagementService.editMenuFood(orderItems);
-      
+
       // If in edit mode, update the booking with total meal price
       if (isEditMode && bookingId) {
-        await menuManagementService.editBooking(bookingId, { 
-          total_meal_price: getTotalOrderAmount() 
+        await menuManagementService.editBooking(bookingId, {
+          total_meal_price: getTotalOrderAmount(),
         });
       }
 
       if (updatedMenus) {
         if (isEditMode) {
-          toast.success(itemsBeingOrdered.length > 0 
-            ? "Meal selections updated successfully!" 
-            : "All meal selections have been removed.");
+          toast.success(
+            itemsBeingOrdered.length > 0
+              ? "Meal selections updated successfully!"
+              : "All meal selections have been removed."
+          );
         } else {
-          toast.success(itemsBeingOrdered.length > 0
-            ? "Meal pre-ordered successfully!"
-            : "Proceeding without meal pre-orders.");
+          toast.success(
+            itemsBeingOrdered.length > 0
+              ? "Meal pre-ordered successfully!"
+              : "Proceeding without meal pre-orders."
+          );
         }
         navigate(`/payment/${tripId}/${nicFromQuery}/${bookingId}`);
       } else {
-        toast.error("Something went wrong updating your meal selections. Please try again.");
+        toast.error(
+          "Something went wrong updating your meal selections. Please try again."
+        );
       }
     } catch (error) {
       console.error("Error submitting meal pre-order:", error);
@@ -267,7 +297,7 @@ const MealPreOrderFromEmail = () => {
 
     let total = 0;
     Object.entries(formValues).forEach(([itemId, count]) => {
-      const menuItem = menu.find(item => item._id === itemId);
+      const menuItem = menu.find((item) => item._id === itemId);
       if (menuItem && count > 0) {
         total += (menuItem.price || 0) * count;
       }

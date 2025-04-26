@@ -84,6 +84,17 @@ const DataTable = ({
     </TableCell>
   );
 
+  // CSS styles for horizontal scrolling
+  const tableContainerStyle = {
+    overflowX: 'auto',
+    width: '100%'
+  };
+
+  const tableCellStyle = {
+    minWidth: '180px',
+    whiteSpace: 'nowrap'
+  };
+
   return (
     <>
       {addFormComponent && (
@@ -97,14 +108,14 @@ const DataTable = ({
         </div>
       )}
 
-      <div className="rounded-md border">
+      <div className="rounded-md border" style={tableContainerStyle}>
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
-                <TableHead key={column.key}>{column.label}</TableHead>
+                <TableHead key={column.key} style={tableCellStyle}>{column.label}</TableHead>
               ))}
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-right" style={{ minWidth: '80px' }}>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,7 +203,7 @@ const DataTable = ({
                   ) : (
                     <>
                       {columns.map((column) => (
-                        <TableCell key={`edit-${item._id}-${column.key}`}>
+                        <TableCell key={`edit-${item._id}-${column.key}`} style={tableCellStyle}>
                           {column.renderEdit ? (
                             column.renderEdit(item[column.key], item)
                           ) : (
@@ -217,13 +228,13 @@ const DataTable = ({
                 // Display mode
                 <TableRow key={`display-row-${item._id}`}>
                   {columns.map((column) => (
-                    <TableCell key={`${item._id}-${column.key}`}>
+                    <TableCell key={`${item._id}-${column.key}`} style={tableCellStyle}>
                       {column.render
                         ? column.render(item[column.key], item)
                         : item[column.key]}
                     </TableCell>
                   ))}
-                  <TableCell className="text-right">
+                  <TableCell className="text-right" style={{ minWidth: '80px' }}>
                     <Button
                       size="sm"
                       variant="ghost"

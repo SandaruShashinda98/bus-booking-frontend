@@ -50,6 +50,7 @@ const BusStaffManagement = () => {
         data || {
           staff_id: "",
           staff_name: "",
+          staff_username: "",
           role: "",
           contact_number: "",
           assigned_trip: "",
@@ -105,6 +106,10 @@ const BusStaffManagement = () => {
       label: "Staff Name",
     },
     {
+      key: "staff_username",
+      label: "Staff  Username",
+    },
+    {
       key: "role",
       label: "Role",
     },
@@ -137,6 +142,13 @@ const BusStaffManagement = () => {
           <Input
             {...register("staff_name")}
             placeholder="Staff Name"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("staff_username")}
+            placeholder="Staff User Name"
             className="w-full bg-white"
           />
         </TableCell>

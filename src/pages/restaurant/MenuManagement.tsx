@@ -12,17 +12,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar as CalendarIcon, PlusCircle } from "lucide-react";
+import { Calendar as CalendarIcon, PlusCircle, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import useAuthGuard from "@/contexts/AuthGuardContext";
 
 const MenuManagement = () => {
   const [menu, setMenu] = useState([]);
+  const [filteredMenu, setFilteredMenu] = useState([]);
   const [dateField, setDateField] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("all"); // "all", "veg", "non-veg"
   const navigate = useNavigate();
-   const { user } = useAuthGuard();
+  const { user } = useAuthGuard();
+
+  // List of common non-vegetarian ingredients
+  const nonVegIngredients = [
+    "chicken", "beef", "pork", "mutton", "fish", "shrimp", "prawn", "seafood", 
+    "meat", "lamb", "bacon", "ham", "sausage", "egg", "eggs", "turkey", "duck",
+    "crab", "lobster", "oyster", "squid", "anchovies", "salami", "pepperoni"
+  ];
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -31,6 +40,7 @@ const MenuManagement = () => {
       if (menuData) {
         console.log(menuData);
         setMenu(menuData);
+        setFilteredMenu(menuData); // Initialize filtered menu with all items
       }
     } catch (error) {
       console.error("Failed to fetch menu data:", error);
@@ -40,9 +50,37 @@ const MenuManagement = () => {
     }
   };
 
+  // Check if an item is vegetarian based on its ingredients
+  const isVegetarian = (item) => {
+    if (!item.ingredients) return true; // If no ingredients listed, assume vegetarian
+    
+    const ingredientsLower = item.ingredients.toLowerCase();
+    return !nonVegIngredients.some(ingredient => 
+      ingredientsLower.includes(ingredient.toLowerCase())
+    );
+  };
+
+  // Apply filter based on vegetarian status
+  const applyFilter = (filter) => {
+    setActiveFilter(filter);
+    
+    if (filter === "all") {
+      setFilteredMenu(menu);
+    } else if (filter === "veg") {
+      setFilteredMenu(menu.filter(item => isVegetarian(item)));
+    } else if (filter === "non-veg") {
+      setFilteredMenu(menu.filter(item => !isVegetarian(item)));
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Update filtered menu when menu changes
+  useEffect(() => {
+    applyFilter(activeFilter);
+  }, [menu]);
 
   // Setup React Hook Form
   const { register, handleSubmit, reset, setValue, watch } = useForm();
@@ -55,7 +93,7 @@ const MenuManagement = () => {
           food: "",
           ingredients: "",
           price: 40,
-          date: new Date().getFullYear(),
+          date: new Date(),
           is_available: true, // Added is_available field with default value
         }
       );
@@ -91,7 +129,7 @@ const MenuManagement = () => {
     }
   };
 
-  // Handle delete TODO
+  // Handle delete
   const handleDelete = async (_id) => {
     try {
       // Here you would call your API to delete the menu item
@@ -119,6 +157,15 @@ const MenuManagement = () => {
     {
       key: "ingredients",
       label: "Ingredients",
+    },
+    {
+      key: "veg_status",
+      label: "Type",
+      render: (_, item) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${isVegetarian(item) ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {isVegetarian(item) ? 'Veg' : 'Non-Veg'}
+        </span>
+      ),
     },
     {
       key: "price",
@@ -167,6 +214,9 @@ const MenuManagement = () => {
           />
         </TableCell>
         <TableCell>
+          <span className="text-gray-400">Auto-detected</span>
+        </TableCell>
+        <TableCell>
           <Input
             {...register("price")}
             type="number"
@@ -191,7 +241,7 @@ const MenuManagement = () => {
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={new Date(formData.date)}
+                selected={formData.date ? new Date(formData.date) : new Date()}
                 onSelect={handleDateSelect}
               />
             </PopoverContent>
@@ -273,6 +323,45 @@ const MenuManagement = () => {
               Menu Management - {`${user?.first_name} ${user?.last_name}`}
             </h1>
           </div>
+          
+          {/* Filter Controls */}
+          <div className="px-6 pt-4 flex items-center">
+            <Filter className="h-5 w-5 mr-2 text-gray-500" />
+            <span className="mr-4 font-medium">Filter:</span>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => applyFilter("all")}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeFilter === "all"
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => applyFilter("veg")}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeFilter === "veg"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Vegetarian
+              </button>
+              <button
+                onClick={() => applyFilter("non-veg")}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeFilter === "non-veg"
+                    ? "bg-red-100 text-red-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                Non-Vegetarian
+              </button>
+            </div>
+          </div>
+          
           <div className="p-6">
             {isLoading ? (
               <div className="flex justify-center items-center h-40">
@@ -281,7 +370,7 @@ const MenuManagement = () => {
             ) : (
               <DataTable
                 columns={columns}
-                data={menu}
+                data={filteredMenu}
                 onUpdate={handleUpdateData}
                 onDelete={handleDelete}
                 renderFormRow={renderFormRow}
