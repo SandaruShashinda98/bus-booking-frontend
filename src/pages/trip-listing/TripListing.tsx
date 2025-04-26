@@ -64,7 +64,9 @@ const TripListing = () => {
           status: "Planned",
           price: 0,
           bus_number: "",
-          driver_conductor_name: "", // New field
+          driver:"",
+          conductor: "",
+          // driver_conductor_name: "", // New field
           washroom_stops: 0, // New field  
           facilities: "", // New field
           bus_type: "Normal", // New field
@@ -158,9 +160,17 @@ const TripListing = () => {
       label: "Bus Number",
     },
     {
-      key: "driver_conductor_name", // New column
-      label: "Driver/Conductor Name",
+      key: "driver",
+      label: "Driver",
     },
+    {
+      key: "conductor",
+      label: "Conductor",
+    },
+    // {
+    //   key: "driver_conductor_name", // New column
+    //   label: "Driver/Conductor Name",
+    // },
     {
       key: "bus_type", // New column
       label: "Bus Type",
@@ -272,11 +282,27 @@ const TripListing = () => {
         </TableCell>
         <TableCell>
           <Input
+            {...register("driver")}
+            type="text"
+            placeholder="Driver"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        <TableCell>
+          <Input
+            {...register("conductor")}
+            type="text"
+            placeholder="Conductor"
+            className="w-full bg-white"
+          />
+        </TableCell>
+        {/* <TableCell>
+          <Input
             {...register("driver_conductor_name")}
             placeholder="Driver and Conductor names"
             className="w-full bg-white"
           />
-        </TableCell>
+        </TableCell> */}
         <TableCell>
           <Select
             onValueChange={(value) => setValue("bus_type", value)}
@@ -360,7 +386,7 @@ const TripListing = () => {
         </div>
 
         {/* Card Container */}
-        <div className="w-full max-w-6xl bg-white rounded-lg shadow-xl mb-8 overflow-hidden">
+        <div className="w-full bg-white rounded-lg shadow-xl mb-8 overflow-hidden">
           <div className="bg-blue-600 text-white py-4 px-6">
             <h1 className="text-2xl md:text-3xl font-bold flex items-center">
               <svg
