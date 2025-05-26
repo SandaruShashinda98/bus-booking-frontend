@@ -86,7 +86,7 @@ const BookingCancellation = () => {
               <input
                 type="text"
                 className="w-full p-3 bg-gray-200 rounded-md"
-                placeholder="e.g., A12, B5, 23C"
+                placeholder="e.g: 12"
                 {...register("seat_number", {
                   required: "Seat number is required",
                   minLength: {
