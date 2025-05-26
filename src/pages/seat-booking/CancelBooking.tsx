@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const BookingCancellation = () => {
-  // In a real application, you would need to install react-hook-form
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm();
+    formState: { errors, isSubmitting, isValid },
+  } = useForm({
+    mode: "onChange" // Enable real-time validation
+  });
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ const BookingCancellation = () => {
       await bookingService.cancelBooking(data);
 
       setSubmitted(true);
-      toast.info(" Your booking has been successfully cancelled.");
+      toast.info("Your booking has been successfully cancelled.");
     } catch {
       toast.error("Data not found. Please try again.");
     }
@@ -58,13 +59,19 @@ const BookingCancellation = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-white text-xl mb-2">
-                Booking ID
+                Booking ID <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 className="w-full p-3 bg-gray-200 rounded-md"
+                placeholder="Enter your booking ID"
                 {...register("booking_id", {
                   required: "Booking ID is required",
+                  minLength: {
+                    value: 1,
+                    message: "Booking ID cannot be empty"
+                  },
+                  validate: value => value.trim() !== "" || "Booking ID cannot be empty"
                 })}
               />
               {errors.booking_id && (
@@ -74,17 +81,23 @@ const BookingCancellation = () => {
 
             <div>
               <label className="block text-white text-xl mb-2">
-                Seat Number
+                Seat Number <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 className="w-full p-3 bg-gray-200 rounded-md"
+                placeholder="e.g., A12, B5, 23C"
                 {...register("seat_number", {
                   required: "Seat number is required",
-                  pattern: {
-                    value: /^[A-Z0-9]{1,3}$/,
-                    message: "Please enter a valid seat number",
+                  minLength: {
+                    value: 1,
+                    message: "Seat number cannot be empty"
                   },
+                  pattern: {
+                    value: /^[A-Z0-9]{1,3}$/i,
+                    message: "Please enter a valid seat number (1-3 characters, letters and numbers only)",
+                  },
+                  validate: value => value.trim() !== "" || "Seat number cannot be empty"
                 })}
               />
               {errors.seat_number && (
@@ -96,17 +109,23 @@ const BookingCancellation = () => {
 
             <div>
               <label className="block text-white text-xl mb-2">
-                Passenger NIC / Passport Number
+                Passenger NIC / Passport Number <span className="text-red-400">*</span>
               </label>
               <input
                 type="text"
                 className="w-full p-3 bg-gray-200 rounded-md"
+                placeholder="Enter NIC or Passport number"
                 {...register("nic", {
                   required: "Passenger ID is required",
-                  pattern: {
-                    value: /^[A-Z0-9]{6,12}$/i,
-                    message: "Please enter a valid ID number",
+                  minLength: {
+                    value: 1,
+                    message: "ID must be at least 6 characters long"
                   },
+                  maxLength: {
+                    value: 12,
+                    message: "ID must be no more than 12 characters long"
+                  },
+                  validate: value => value.trim() !== "" || "Passenger ID cannot be empty"
                 })}
               />
               {errors.nic && (
@@ -117,13 +136,19 @@ const BookingCancellation = () => {
             <div className="pt-4">
               <button
                 type="submit"
-                className="block w-64 mx-auto bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-md transition duration-300"
-                disabled={isSubmitting}
+                className="block w-64 mx-auto bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-md transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isSubmitting || !isValid}
               >
                 {isSubmitting ? "Processing..." : "Confirm Cancellation"}
               </button>
             </div>
           </form>
+
+          <div className="mt-4 text-center">
+            <p className="text-white text-sm opacity-75">
+              <span className="text-red-400">*</span> All fields are required
+            </p>
+          </div>
         </div>
       </div>
     </div>
